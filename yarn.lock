@@ -907,10 +907,10 @@
   dependencies:
     "@opentelemetry/instrumentation" "^0.52.0 || ^0.53.0 || ^0.54.0 || ^0.55.0 || ^0.56.0 || ^0.57.0"
 
-"@rd/ludo-rules@1.0.1-beta.4":
-  version "1.0.1-beta.4"
-  resolved "https://npm.lumigame.com/@rd/ludo-rules/-/ludo-rules-1.0.1-beta.4.tgz#0fec0d109bde046f237dc596c51540180ada3b91"
-  integrity sha512-BRsR1sR0wCmxj8blpPILcoxRRw1lDrIcxs86pZVemp3DvuTX6b3Mk3Q4WSn07yBN1+vPkgKRM32tw+KQ+FERUQ==
+"@rd/ludo-rules@1.0.1-beta.6":
+  version "1.0.1-beta.6"
+  resolved "https://npm.lumigame.com/@rd/ludo-rules/-/ludo-rules-1.0.1-beta.6.tgz#9323d1615455d8bd50b589b7cb2f53e067a178e7"
+  integrity sha512-z+gxAl9I5C/q+25XI7U/OWK3YlTDxtYE15di2FCNNChiiyjVmlmlpjjVHwmnyGbeZbgiOG8OKjfl1pAWfRNYEg==
   dependencies:
     chance "^1.1.13"
 
@@ -2893,6 +2893,11 @@ sc-common@3.0.0:
     jwks-rsa "3.2.0"
     mongoose-long "0.8.0"
     numeral "2.0.6"
+
+sc-core-rng@^1.1.0:
+  version "1.1.0"
+  resolved "https://npm.lumigame.com/sc-core-rng/-/sc-core-rng-1.1.0.tgz#90246a382ca507270b34eeb453bbd6db6879bca7"
+  integrity sha512-fjPYv8GBMhnjq5btJT/QsgyuRc3XILx7LPqvosP7BqquIa0CYDww9bRJAMDBRCzyprsZHo5zSjLhSIGIUEJdFg==
 
 sc-game-base@6.3.2-beta.1:
   version "6.3.2-beta.1"

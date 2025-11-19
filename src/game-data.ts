@@ -1,9 +1,12 @@
-import { PlayerAction, TurnResult } from "@rd/ludo-rules";
+import { initSameValue, PlayerAction, PlayerColor } from "@rd/ludo-rules";
+import { BoardState } from "@rd/ludo-rules/dist/core-game/board-state.js";
 import { Table } from "sc-game-base";
 
 export default class GameData extends Table.TableGameData {
-  previousBoardState?: TurnResult;
-  currentBoardState?: TurnResult;
+  previousBoardState?: BoardState;
+  currentBoardState: BoardState = initSameValue([0, 0, 0, 0]);
+  currentTurnIndex: number = 0;
+  currentPlayers: PlayerColor[] = [];
   declare gameConfigs: {
     gameId: number;
   };

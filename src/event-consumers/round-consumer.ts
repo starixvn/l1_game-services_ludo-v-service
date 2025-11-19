@@ -1,4 +1,4 @@
-import { PlayerColor } from "@rd/ludo-rules";
+import { initSameValue, PlayerColor } from "@rd/ludo-rules";
 import mongoose from "mongoose";
 import GameManagementApiClientFactory, {
   getOrDefault,
@@ -36,11 +36,14 @@ export class RoundConsumer {
       this.gameData.currentBoardState = lastRound.result.boardState;
     } else {
       this.gameData.roundId = await this.getLastArchiveRound();
-      this.gameData.currentBoardState = {
-        raceMap: {},
-        stableMap: {} as Record<PlayerColor, number[]>,
-        startingAreaMap: {} as Record<PlayerColor, number>,
-      };
+      this.gameData.currentBoardState = initSameValue([0, 0, 0, 0]);
+      this.gameData.currentPlayers = [
+        PlayerColor.RED,
+        PlayerColor.GREEN,
+        PlayerColor.YELLOW,
+        PlayerColor.BLUE,
+      ];
+      this.gameData.currentTurnIndex = 0;
     }
   }
 

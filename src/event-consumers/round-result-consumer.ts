@@ -6,8 +6,17 @@ export class RoundResultConsumer extends Core.BaseEventConsumers
   .RoundResultConsumer {
   declare gameData: GameData;
   declare definition: GameDefinition;
+
   async generateResult() {
     const data = this.getDataForGenerateResult();
     this.gameData.result = this.definition.generateResult(data);
+  }
+
+  getDataForGenerateResult() {
+    return {
+      currentBoardState: this.gameData.currentBoardState,
+      currentTurnIndex: this.gameData.currentTurnIndex,
+      currentPlayers: this.gameData.currentPlayers,
+    };
   }
 }
