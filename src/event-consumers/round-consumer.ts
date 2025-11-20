@@ -33,17 +33,17 @@ export class RoundConsumer {
 
     if (lastRound) {
       this.gameData.roundId = lastRound.id + 1;
-      this.gameData.currentBoardState = lastRound.result.boardState;
+      this.gameData.result.currentBoardState = lastRound.result.boardState;
     } else {
       this.gameData.roundId = await this.getLastArchiveRound();
-      this.gameData.currentBoardState = initSameValue([0, 0, 0, 0]);
-      this.gameData.currentPlayers = [
+      this.gameData.result.currentBoardState = initSameValue([0, 0, 0, 0]);
+      this.gameData.result.currentPlayers = [
         PlayerColor.RED,
         PlayerColor.GREEN,
         PlayerColor.YELLOW,
         PlayerColor.BLUE,
       ];
-      this.gameData.currentTurnIndex = 0;
+      this.gameData.result.currentTurnIndex = 0;
     }
   }
 

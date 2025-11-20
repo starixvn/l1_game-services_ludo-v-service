@@ -14,9 +14,10 @@ export class RoundResultConsumer extends Core.BaseEventConsumers
 
   getDataForGenerateResult() {
     return {
-      currentBoardState: this.gameData.currentBoardState,
-      currentTurnIndex: this.gameData.currentTurnIndex,
-      currentPlayers: this.gameData.currentPlayers,
+      currentBoardState: this.gameData.result.currentBoardState,
+      currentTurnIndex: this.gameData.result.currentTurnIndex,
+      currentPlayers: this.gameData.result.currentPlayers,
+      winners: this.gameData.result.winners,
     };
   }
 }

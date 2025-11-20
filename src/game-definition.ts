@@ -6,6 +6,7 @@ export type GenerateResultData = {
   currentBoardState: BoardState;
   currentTurnIndex: number;
   currentPlayers: PlayerColor[];
+  winners: PlayerColor[];
 };
 
 export default class GameDefinition extends Table.TableGameDefinition {
