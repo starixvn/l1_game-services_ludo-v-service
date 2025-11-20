@@ -41,7 +41,7 @@ export const generateResult = async (
     board: gameState.board,
     nextTurnIndex: nextTurn,
     currentPlayers: [...data.currentPlayers],
-    winners: gameState.winner ?? [],
+    winners: gameState.winners ?? [],
     action: {
       oldPosition: 0,
       newPosition: 0,

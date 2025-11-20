@@ -17,7 +17,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@rd/ludo-rules": "1.0.1-beta.6",
+    "@rd/ludo-rules": "1.0.1-beta.8",
     "extensionless": "^2.0.2",
     "sc-core-rng": "^1.1.0",
     "sc-game-base": "6.3.2-beta.1"
