@@ -1,11 +1,3 @@
-export const resultHelper = {
-  generateResult: (gameData: any) => {
-    return gameData.result;
-  },
-  getSettlementResult: (gameData: any) => {
-    return gameData.settlementResult;
-  },
-  generateRawResultForHash: (gameData: any) => {
-    return gameData.rawResultForHash;
-  },
-};
+export * from "./generate-odds.js";
+export * from "./generate-result.js";
+export * from "./generate-settlement-result.js";

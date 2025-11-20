@@ -1,6 +1,7 @@
 import { Table } from "sc-game-base";
 import {
   RoundConsumer,
+  RoundResultConsumer,
   SettleGameRoundConsumer,
 } from "../event-consumers/index.js";
 import GameData from "../game-data.js";
@@ -12,6 +13,7 @@ export class GameCron extends Table.Crons.TableGameCron {
   declare definition: GameDefinition;
   declare settleGameRoundConsumer: SettleGameRoundConsumer;
   declare gameData: GameData;
+  declare roundResultConsumer: RoundResultConsumer;
 
   constructor({
     definition,
@@ -64,6 +66,14 @@ export class GameCron extends Table.Crons.TableGameCron {
     this.startCron();
   }
 
+  calculateOdds() {
+    const { margin } = this.gameData.gameConfigs;
+    this.gameData.odds = this.definition.generateOdds(
+      margin,
+      this.gameData.result,
+    );
+  }
+
   async proceed() {
     const { durations } = this.definition;
     if (this.gameData.remainingTime === durations.wholeRound) {
@@ -77,6 +87,7 @@ export class GameCron extends Table.Crons.TableGameCron {
     const remainingTime = this.gameData.remainingTime;
     if (this.isStartingTime(remainingTime, durations)) {
       this.resetForNewRound();
+      this.calculateOdds();
       this.bot && this.bot.reset();
     }
 

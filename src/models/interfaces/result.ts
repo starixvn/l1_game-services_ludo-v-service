@@ -2,9 +2,11 @@ import { PlayerAction, PlayerColor } from "@rd/ludo-rules";
 import { BoardState } from "@rd/ludo-rules/dist/core-game/board-state.js";
 
 export interface IResult {
-  dice: number[];
+  board: BoardState;
+  nextTurnIndex: number;
+  currentPlayers: PlayerColor[];
+  winners: PlayerColor[];
   action: PlayerAction;
-  playerColor: PlayerColor;
-  boardState: BoardState;
+  dice: number[];
   kickedPlayer?: PlayerColor;
 }

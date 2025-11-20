@@ -1,6 +1,6 @@
-import { Result } from "../types.js";
+import { IResult } from "../models/interfaces/result.js";
 
-export const generateSettlementResult = (result: Result) => {
+export const generateSettlementResult = (result: IResult) => {
   const sum = result.dice[0] + result.dice[1];
   return {
     odd: sum % 2 === 0,

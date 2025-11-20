@@ -4,23 +4,28 @@ import ContainerRegistry from "./container-registry.js";
 import GameData from "./game-data.js";
 import GameDefinition from "./game-definition.js";
 import gameSettings from "./game-settings.js";
-import { resultHelper } from "./helpers/index.js";
+import {
+  generateOdds,
+  generateResult,
+  generateSettlementResult,
+} from "./helpers/index.js";
 
 const run = async () => {
   const definition = new GameDefinition(
-    gameSettings as any,
-    resultHelper.generateResult,
-    resultHelper.getSettlementResult,
-    resultHelper.generateRawResultForHash,
+    gameSettings,
+    generateResult,
+    generateSettlementResult,
+    undefined,
+    generateOdds,
   );
 
   const gameData = new GameData(gameSettings.durations.wholeRound);
 
   const app = new Core.BaseGameApp(gameSettings.name, appConfigs);
   const container = new ContainerRegistry().register(
-    appConfigs as any,
-    definition as any,
-    gameData as any,
+    appConfigs,
+    definition,
+    gameData,
   );
   await app.run();
   await app.startGame(container);

@@ -1,4 +1,4 @@
-import { initSameValue, PlayerColor } from "@rd/ludo-rules";
+import { PlayerColor } from "@rd/ludo-rules";
 import mongoose from "mongoose";
 import GameManagementApiClientFactory, {
   getOrDefault,
@@ -13,12 +13,17 @@ export class RoundConsumer {
   gameData: GameData;
   definition: GameDefinition;
   gameManagementApiClient: gameManagementClient;
-  constructor(
-    roundsRepository: mongoose.Model<IRound>,
-    gameData: GameData,
-    definition: GameDefinition,
-    gameManagementApiClientFactory: GameManagementApiClientFactory,
-  ) {
+  constructor({
+    roundsRepository,
+    gameData,
+    definition,
+    gameManagementApiClientFactory,
+  }: {
+    roundsRepository: mongoose.Model<IRound>;
+    gameData: GameData;
+    definition: GameDefinition;
+    gameManagementApiClientFactory: GameManagementApiClientFactory;
+  }) {
     this.roundsRepository = roundsRepository;
     this.gameData = gameData;
     this.definition = definition;
@@ -27,23 +32,28 @@ export class RoundConsumer {
 
   async initNewRound() {
     const lastRound = await this.roundsRepository
-      .findOne({}, "id", { sort: { id: -1 } })
+      .findOne({}, { id: 1, result: 1 }, { sort: { id: -1 } })
       .lean()
       .exec();
 
     if (lastRound) {
       this.gameData.roundId = lastRound.id + 1;
-      this.gameData.result.currentBoardState = lastRound.result.boardState;
+      this.gameData.result = lastRound.result;
     } else {
       this.gameData.roundId = await this.getLastArchiveRound();
-      this.gameData.result.currentBoardState = initSameValue([0, 0, 0, 0]);
+      this.gameData.result.board = {
+        [PlayerColor.RED]: [0, 0, 0, 0],
+        [PlayerColor.GREEN]: [0, 0, 0, 0],
+        [PlayerColor.YELLOW]: [0, 0, 0, 0],
+        [PlayerColor.BLUE]: [0, 0, 0, 0],
+      };
       this.gameData.result.currentPlayers = [
         PlayerColor.RED,
         PlayerColor.GREEN,
         PlayerColor.YELLOW,
         PlayerColor.BLUE,
       ];
-      this.gameData.result.currentTurnIndex = 0;
+      this.gameData.result.nextTurnIndex = 0;
     }
   }
 
@@ -51,7 +61,7 @@ export class RoundConsumer {
     const { configName } = this.definition;
     const archiveStatus = await getOrDefault(
       this.gameManagementApiClient.archiveStatus.getArchiveStatus(configName),
-      {},
+      undefined,
     );
 
     return archiveStatus

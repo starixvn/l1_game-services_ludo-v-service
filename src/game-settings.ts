@@ -1,7 +1,7 @@
 export default {
   id: 148,
   durations: {
-    wholeRound: 60,
+    wholeRound: 3,
   },
   name: "ludo",
 };

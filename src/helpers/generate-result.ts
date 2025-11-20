@@ -1,17 +1,24 @@
 import {
   DiceState,
-  initSameValue,
   PlayerColor,
   PlayerMoveInput,
   updateGameState,
 } from "@rd/ludo-rules";
 import { secureRandomRange } from "sc-core-rng";
 import { GenerateResultData } from "../game-definition.js";
+import { IResult } from "../models/interfaces/result.js";
 import { ruleBotInstance } from "./rule-bot-instance.js";
 
-export const generateResult = async (data: GenerateResultData) => {
+export const generateResult = async (
+  data: GenerateResultData,
+): Promise<IResult> => {
   if (data.winners.length >= 4) {
-    data.currentBoardState = initSameValue([0, 0, 0, 0]);
+    data.currentBoardState = {
+      [PlayerColor.RED]: [0, 0, 0, 0],
+      [PlayerColor.GREEN]: [0, 0, 0, 0],
+      [PlayerColor.YELLOW]: [0, 0, 0, 0],
+      [PlayerColor.BLUE]: [0, 0, 0, 0],
+    };
     data.currentTurnIndex = secureRandomRange(0, 3);
     data.currentPlayers = [
       PlayerColor.RED,
@@ -31,11 +38,15 @@ export const generateResult = async (data: GenerateResultData) => {
   );
 
   return {
-    boardState: gameState.board,
-    dice,
-    action: gameState.playerAction,
-    kickedPlayer: gameState.kickedPlayer,
+    board: gameState.board,
     nextTurnIndex: nextTurn,
-    winners: gameState.winner,
+    currentPlayers: [...data.currentPlayers],
+    winners: gameState.winner ?? [],
+    action: {
+      oldPosition: 0,
+      newPosition: 0,
+    },
+    dice,
+    kickedPlayer: gameState.kickedPlayer?.player,
   };
 };
