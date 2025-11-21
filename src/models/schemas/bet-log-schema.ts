@@ -7,7 +7,7 @@ export const betLogSchema = new mongoose.Schema<IBetLog>({
   time: { type: Date, required: true },
   choice: { type: String, required: true },
   amount: { type: Number, required: true },
-  clientSentTime: { type: Date, required: true },
+  clientSentTime: { type: Date },
   receivedTime: { type: Date, required: true },
   roundId: { type: Number, required: true },
 });

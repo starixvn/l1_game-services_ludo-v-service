@@ -30,4 +30,5 @@ export const betSchema = new mongoose.Schema<IBet>({
   operatorId: { type: String, required: true },
   reachMaxWin: { type: Boolean, default: false },
   maxWin: { type: Number, default: 0 },
+  margin: { type: Number, required: true },
 });

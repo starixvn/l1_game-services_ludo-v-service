@@ -27,4 +27,5 @@ export interface IBet {
   operatorId: string;
   reachMaxWin: boolean;
   maxWin: number;
+  margin: number;
 }
