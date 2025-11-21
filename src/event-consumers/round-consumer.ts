@@ -43,7 +43,10 @@ export class RoundConsumer {
     if (lastRound) {
       this.gameData.roundId = lastRound.id + 1;
       this.gameData.result = lastRound.result;
-      this.gameData.initRoundId = lastRound.initRoundId;
+      this.gameData.initRoundId =
+        lastRound.result.winners.length > 0
+          ? this.gameData.roundId
+          : lastRound.initRoundId;
     } else {
       this.gameData.roundId = await this.getLastArchiveRound();
       this.gameData.result.board = {

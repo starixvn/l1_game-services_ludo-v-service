@@ -10,6 +10,15 @@ export default {
   hostingPort: 5000,
   apiSettings: {
     authUrl: "http://localhost:3000/api/auth",
+    apiUrl: "http://localhost:3000/api/game",
+    client: {
+      id: "game-server",
+      secret: "gameserver@20luminet&",
+    },
+    useAuthenticate: true,
+    requestTimeout: 10000,
+    placeBetTimeout: 2000,
+    enabledApiLogs: true,
   },
   authenticateSettings: {
     url: "http://localhost:3000/api/auth",

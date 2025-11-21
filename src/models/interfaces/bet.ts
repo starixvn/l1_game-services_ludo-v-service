@@ -1,0 +1,30 @@
+export interface IBet {
+  uid: string;
+  name: string;
+  big?: number;
+  small?: number;
+  odd?: number;
+  even?: number;
+  kick?: number;
+  move?: number;
+  release?: number;
+  goStable?: number;
+  noStable?: number;
+  noKick?: number;
+  noMove?: number;
+  noRelease?: number;
+  totalAmount: number;
+  betwin: number;
+  time: Date;
+  odds: any;
+  freeBet: boolean;
+  roundId: number;
+  paid: boolean;
+  currency: string;
+  playerId: string;
+  siteId: string;
+  rate: number;
+  operatorId: string;
+  reachMaxWin: boolean;
+  maxWin: number;
+}
