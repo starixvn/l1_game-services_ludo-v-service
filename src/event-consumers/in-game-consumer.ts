@@ -1,7 +1,9 @@
+import { getAllActionByBot } from "@rd/ludo-rules";
 import { Table } from "sc-game-base";
 import { Systems } from "sc-game-base/dist/constants/systems.js";
 import GameData from "../game-data.js";
 import GameDefinition from "../game-definition.js";
+import { ruleBotInstance } from "../helpers/rule-bot-instance.js";
 import { RoundQuery } from "../query-apis/round-query.js";
 import { RealPlayer } from "../types.js";
 
@@ -17,11 +19,11 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
   declare gameData: GameData;
   declare roundQuery: RoundQuery;
   declare definition: GameDefinition;
+
   async buildPayload(realPlayer: RealPlayer) {
     const user = await this.getUserInfo(realPlayer);
 
-    const { odds, originalOdds, enableFreeBet, boostedChoices } =
-      this.gameData.gameConfigs;
+    const { margin } = this.gameData.gameConfigs;
     const { totalBets, roundId, exchangeRates } = this.gameData;
     const { session } = realPlayer;
     const rate = exchangeRates.code[session.currencyCode] * session.multiplier;
@@ -30,10 +32,8 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
     );
     const gameConfigs = {
       ...settings,
-      odds,
-      originalOdds,
-      enableFreeBet,
-      boostedChoices,
+      margin,
+      odds: this.gameData.odds,
     };
     const { ownBets } = this.gameData.ingame[realPlayer.profile.name] || {
       ownBets: {},
@@ -52,6 +52,7 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
       gameConfigs,
       roundHistory,
       ownBets,
+      roundData: this.generateRoundData(),
       totalBets,
       user: { ...user, rate },
     } as any;
@@ -87,5 +88,29 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
     return disabled && realPlayer.session?.system === Systems.Mini
       ? { ...payload, players, chips }
       : { ...payload, remainingTime, players, chips };
+  }
+
+  async generateRoundData() {
+    const nextPlayerColor =
+      this.gameData.result.currentPlayers[this.gameData.result.nextTurnIndex];
+    const possibleActionSet = await getAllActionByBot(
+      ruleBotInstance,
+      this.gameData.result.board,
+      nextPlayerColor,
+    );
+    const possibleActions = Object.keys(possibleActionSet).map((key) => {
+      const [oldPosition, newPosition] = key.split("-");
+      return {
+        oldPosition: parseInt(oldPosition),
+        newPosition: parseInt(newPosition),
+      };
+    });
+    return {
+      board: this.gameData.result.board,
+      currentTurnCount: this.gameData.roundId - this.gameData.initRoundId,
+      action: this.gameData.result.action,
+      nextPlayerColor,
+      possibleActions,
+    };
   }
 }

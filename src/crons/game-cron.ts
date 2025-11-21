@@ -66,9 +66,9 @@ export class GameCron extends Table.Crons.TableGameCron {
     this.startCron();
   }
 
-  calculateOdds() {
+  async calculateOdds() {
     const { margin } = this.gameData.gameConfigs;
-    this.gameData.odds = this.definition.generateOdds(
+    this.gameData.odds = await this.definition.generateOdds(
       margin,
       this.gameData.result,
     );
@@ -87,7 +87,7 @@ export class GameCron extends Table.Crons.TableGameCron {
     const remainingTime = this.gameData.remainingTime;
     if (this.isStartingTime(remainingTime, durations)) {
       this.resetForNewRound();
-      this.calculateOdds();
+      await this.calculateOdds();
       this.bot && this.bot.reset();
     }
 
