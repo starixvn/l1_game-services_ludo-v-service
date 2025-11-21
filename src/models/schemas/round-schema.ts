@@ -9,4 +9,5 @@ export const roundSchema = new Schema<IRound>({
   settlementResult: { type: settlementResultSchema, required: true },
   time: { type: Date, required: true },
   exchangeRateId: { type: Number, required: true },
+  initRoundId: { type: Number },
 });

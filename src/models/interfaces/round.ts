@@ -5,6 +5,7 @@ export interface IRound {
   id: number;
   result: IResult;
   settlementResult: ISettlementResult;
+  initRoundId: number;
   time: Date;
   exchangeRateId: number;
   matchId: number;

@@ -12,3 +12,34 @@ export type Odds = {
   goStable: number;
   noStable: number;
 };
+
+export type RealPlayer = {
+  UID: string;
+  name: string;
+  red: number;
+  avatarId: number;
+  type: string;
+  rate: number;
+  session: {
+    system: number;
+    currencyCode: string;
+    currencyGroupId: string;
+    multiplier: number;
+  };
+  promotion: {
+    promotionId: string;
+    promotionName: string;
+  };
+  profile: {
+    name: string;
+  };
+  promotionTOProgress?: {
+    totalTurnover: number;
+    minRequiredTurnover: number;
+    remainingTO: number;
+    progressPercentage: number;
+    canClaim: boolean;
+    totalWinAmount: number;
+    claimExpirationDate: Date;
+  };
+};

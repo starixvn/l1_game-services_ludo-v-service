@@ -2,6 +2,7 @@ import { asClass, asValue } from "awilix";
 import { Table } from "sc-game-base";
 import { GameCron } from "./crons/game-cron.js";
 import {
+  InGameConsumer,
   RoundConsumer,
   RoundResultConsumer,
   SettleGameRoundConsumer,
@@ -21,6 +22,7 @@ export default class ContainerRegistry extends Table.TableContainerRegistry {
     super.registerConsumers();
 
     this.container.register({
+      inGameConsumer: asClass(InGameConsumer).singleton(),
       roundConsumer: asClass(RoundConsumer).singleton().proxy(),
       roundResultConsumer: asClass(RoundResultConsumer).singleton(),
       settleGameRoundConsumer: asClass(SettleGameRoundConsumer)

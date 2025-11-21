@@ -12,7 +12,7 @@ import { ruleBotInstance } from "./rule-bot-instance.js";
 export const generateResult = async (
   data: GenerateResultData,
 ): Promise<IResult> => {
-  if (data.winners.length >= 4) {
+  if (data.winners.length > 0) {
     data.currentBoardState = {
       [PlayerColor.RED]: [0, 0, 0, 0],
       [PlayerColor.GREEN]: [0, 0, 0, 0],
@@ -26,6 +26,7 @@ export const generateResult = async (
       PlayerColor.YELLOW,
       PlayerColor.BLUE,
     ];
+    data.winners = [];
   }
   const dice = [secureRandomRange(1, 6), secureRandomRange(1, 6)];
   const diceState = new DiceState(dice);
@@ -36,12 +37,13 @@ export const generateResult = async (
     diceState,
     (input: PlayerMoveInput) => ruleBotInstance.move(input),
   );
+  data.winners = [...data.winners, ...(gameState.winners ?? [])];
 
   return {
     board: gameState.board,
     nextTurnIndex: nextTurn,
     currentPlayers: [...data.currentPlayers],
-    winners: gameState.winners ?? [],
+    winners: data.winners,
     action: {
       ...gameState.playerAction,
       playerColor: gameState.currentPlayer,

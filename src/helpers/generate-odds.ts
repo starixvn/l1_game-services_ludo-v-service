@@ -27,20 +27,11 @@ export const generateOdds = async (margin: number, currentResult: IResult) => {
       await calculateActionOdds(dices, currentResult, raceMap, oddCounts);
     }
   }
-  return {
-    odd: 1 / (oddCounts.odd / 36) - margin,
-    even: 1 / (oddCounts.even / 36) - margin,
-    big: 1 / (oddCounts.big / 36) - margin,
-    small: 1 / (oddCounts.small / 36) - margin,
-    move: 1 / (oddCounts.move / 36) - margin,
-    noMove: 1 / (oddCounts.noMove / 36) - margin,
-    release: 1 / (oddCounts.release / 36) - margin,
-    noRelease: 1 / (oddCounts.noRelease / 36) - margin,
-    goStable: 1 / (oddCounts.goStable / 36) - margin,
-    noStable: 1 / (oddCounts.noStable / 36) - margin,
-    kick: 1 / (oddCounts.kick / 36) - margin,
-    noKick: 1 / (oddCounts.noKick / 36) - margin,
-  };
+
+  return ODDS_KEYS.reduce((acc, key) => {
+    acc[key as keyof Odds] = 1 / (oddCounts[key as keyof Odds] / 36) - margin;
+    return acc;
+  }, {} as Odds);
 };
 
 const calculateDiceOdds = (diceSum: number, oddCounts: Odds) => {

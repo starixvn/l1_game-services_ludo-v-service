@@ -7,7 +7,13 @@ export default class GameData extends Table.TableGameData {
   declare gameConfigs: {
     gameId: number;
     margin: number;
+    enabled: boolean;
+    odds: Odds;
+    originalOdds: Odds;
+    enableFreeBet: boolean;
+    boostedChoices: boolean;
   };
+  initRoundId: number;
   constructor(remainingTime: number) {
     super(remainingTime);
     this.result = {
@@ -32,7 +38,13 @@ export default class GameData extends Table.TableGameData {
         playerColor: PlayerColor.RED,
       },
     };
+    this.initRoundId = 0;
   }
   declare result: IResult;
   declare odds: Odds;
+  declare exchangeRates: { exId: number; code: { [key: string]: number } };
+  declare currencyGroupGames: { groupId: number; name: string }[];
+  declare ingame: {
+    [key: string]: { ownBets: { [key: string]: number }; clientSeed: string };
+  };
 }

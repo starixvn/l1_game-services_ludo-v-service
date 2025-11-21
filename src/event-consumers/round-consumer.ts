@@ -32,13 +32,18 @@ export class RoundConsumer {
 
   async initNewRound() {
     const lastRound = await this.roundsRepository
-      .findOne({}, { id: 1, result: 1 }, { sort: { id: -1 } })
+      .findOne(
+        {},
+        { id: 1, result: 1, currentTurn: 1, initRoundId: 1 },
+        { sort: { id: -1 } },
+      )
       .lean()
       .exec();
 
     if (lastRound) {
       this.gameData.roundId = lastRound.id + 1;
       this.gameData.result = lastRound.result;
+      this.gameData.initRoundId = lastRound.initRoundId;
     } else {
       this.gameData.roundId = await this.getLastArchiveRound();
       this.gameData.result.board = {
@@ -54,6 +59,7 @@ export class RoundConsumer {
         PlayerColor.BLUE,
       ];
       this.gameData.result.nextTurnIndex = 0;
+      this.gameData.initRoundId = this.gameData.roundId;
     }
   }
 
