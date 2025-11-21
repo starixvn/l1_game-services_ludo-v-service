@@ -43,8 +43,8 @@ export const generateResult = async (
     currentPlayers: [...data.currentPlayers],
     winners: gameState.winners ?? [],
     action: {
-      oldPosition: 0,
-      newPosition: 0,
+      ...gameState.playerAction,
+      playerColor: gameState.currentPlayer,
     },
     dice,
     kickedPlayer: gameState.kickedPlayer?.player,

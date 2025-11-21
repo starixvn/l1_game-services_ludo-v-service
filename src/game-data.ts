@@ -29,6 +29,7 @@ export default class GameData extends Table.TableGameData {
       action: {
         oldPosition: 0,
         newPosition: 0,
+        playerColor: PlayerColor.RED,
       },
     };
   }

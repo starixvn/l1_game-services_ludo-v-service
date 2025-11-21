@@ -9,6 +9,12 @@ export const settlementResultSchema = new Schema<ISettlementResult>(
     small: { type: Boolean },
     kick: { type: Boolean },
     noKick: { type: Boolean },
+    move: { type: Boolean },
+    noMove: { type: Boolean },
+    release: { type: Boolean },
+    noRelease: { type: Boolean },
+    goStable: { type: Boolean },
+    noStable: { type: Boolean },
   },
   { _id: false },
 );

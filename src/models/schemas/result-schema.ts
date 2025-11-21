@@ -5,6 +5,7 @@ const actionSchema = new Schema(
   {
     oldPosition: { type: Number, required: true },
     newPosition: { type: Number, required: true },
+    playerColor: { type: Number, required: true },
   },
   { _id: false },
 );

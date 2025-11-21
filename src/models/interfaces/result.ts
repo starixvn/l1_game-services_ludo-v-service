@@ -6,7 +6,7 @@ export interface IResult {
   nextTurnIndex: number;
   currentPlayers: PlayerColor[];
   winners: PlayerColor[];
-  action: PlayerAction;
+  action: PlayerAction & { playerColor: PlayerColor };
   dice: number[];
   kickedPlayer?: PlayerColor;
 }
