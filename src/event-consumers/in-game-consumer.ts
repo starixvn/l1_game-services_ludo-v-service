@@ -55,7 +55,7 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
       gameConfigs,
       roundHistory,
       ownBets,
-      roundData: this.generateRoundData(),
+      currentGameState: await this.generateRoundData(),
       totalBets,
       user: { ...user, rate },
     } as any;

@@ -288,7 +288,7 @@ describe("InGameConsumer", () => {
       expect(payload.gameConfigs).toBeDefined();
       expect(payload.roundHistory).toBeDefined();
       expect(payload.ownBets).toEqual({ big: 50, small: 30 });
-      expect(payload.roundData).toBeDefined();
+      expect(payload.currentGameState).toBeDefined();
       expect(payload.totalBets).toBeDefined();
       expect(payload.user).toBeDefined();
     });

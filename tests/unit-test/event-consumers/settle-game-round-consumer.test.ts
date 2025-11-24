@@ -1,7 +1,6 @@
 import { PlayerColor } from "@rd/ludo-rules";
 import { SettleGameRoundConsumer } from "../../../src/event-consumers/settle-game-round-consumer.js";
 import GameData from "../../../src/game-data.js";
-import GameDefinition from "../../../src/game-definition.js";
 import { IBet } from "../../../src/models/interfaces/bet.js";
 import { IResult } from "../../../src/models/interfaces/result.js";
 import { ISettlementResult } from "../../../src/models/interfaces/settlement-result.js";
@@ -176,7 +175,9 @@ describe("SettleGameRoundConsumer", () => {
 
       // Assert
       expect(roundResult).toBeDefined();
-      expect(roundResult.result.dice).toEqual({ dice1: 3, dice2: 5 });
+      expect(roundResult.result.dice1).toEqual(3);
+      expect(roundResult.result.dice2).toEqual(5);
+      expect(roundResult.result.dice).toBeUndefined();
       expect(roundResult.roundId).toBe(10);
       expect(roundResult.settlementResult).toEqual(settlementResult);
     });
@@ -287,7 +288,9 @@ describe("SettleGameRoundConsumer", () => {
         );
 
         // Assert
-        expect(roundResult.result.dice).toEqual(expected);
+        expect(roundResult.result.dice1).toEqual(dice[0]);
+        expect(roundResult.result.dice2).toEqual(dice[1]);
+        expect(roundResult.result.dice).toBeUndefined();
       });
     });
   });
@@ -895,7 +898,9 @@ describe("SettleGameRoundConsumer", () => {
       ).toHaveBeenCalledWith({
         result: {
           ...mockResult,
-          dice: { dice1: 3, dice2: 4 },
+          dice1: 3,
+          dice2: 4,
+          dice: undefined,
         },
         settlementResult: mockSettlementResult,
         roundId: 10,

@@ -58,10 +58,9 @@ export class SettleGameRoundConsumer extends Table.EventConsumers
     return {
       result: {
         ...result,
-        dice: {
-          dice1: result.dice[0],
-          dice2: result.dice[1],
-        },
+        dice1: result.dice[0],
+        dice2: result.dice[1],
+        dice: undefined,
       },
       settlementResult,
       roundId,
