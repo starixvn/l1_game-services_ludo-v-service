@@ -1,6 +1,7 @@
 import { Table } from "sc-game-base";
 import GameData from "../game-data.js";
 import { IBet } from "../models/interfaces/bet.js";
+import { IResult } from "../models/interfaces/result.js";
 import { ISettlementResult } from "../models/interfaces/settlement-result.js";
 
 export class SettleGameRoundConsumer extends Table.EventConsumers
@@ -47,6 +48,24 @@ export class SettleGameRoundConsumer extends Table.EventConsumers
         this.gameData.winningPlayers,
       );
     }
+  }
+
+  collectRoundResult(
+    result: IResult,
+    settlementResult: ISettlementResult,
+    roundId: number,
+  ) {
+    return {
+      result: {
+        ...result,
+        dice: {
+          dice1: result.dice[0],
+          dice2: result.dice[1],
+        },
+      },
+      settlementResult,
+      roundId,
+    };
   }
 
   calculateBetResult(
