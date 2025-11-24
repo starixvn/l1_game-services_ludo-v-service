@@ -1,7 +1,7 @@
-import { PlayerColor, DiceState } from "@rd/ludo-rules";
-import { generateResult } from "../../../src/helpers/generate-result.js";
-import { GenerateResultData } from "../../../src/game-definition.js";
+import { DiceState, PlayerColor } from "@rd/ludo-rules";
 import * as rng from "sc-core-rng";
+import { GenerateResultData } from "../../../src/game-definition.js";
+import { generateResult } from "../../../src/helpers/generate-result.js";
 
 // Mock dependencies
 jest.mock("sc-core-rng", () => ({
@@ -606,6 +606,53 @@ describe("generateResult", () => {
       // Assert
       // Within same game, winners accumulate
       expect(data.winners).toEqual([PlayerColor.RED]);
+    });
+
+    test("should handle no winners in current round 2", async () => {
+      // Arrange
+      mockSecureRandomRange.mockReturnValue(3);
+
+      const data: GenerateResultData = {
+        currentBoardState: {
+          [PlayerColor.RED]: [10, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        currentTurnIndex: 0,
+        winners: [],
+      };
+
+      mockUpdateGameState.mockResolvedValue({
+        gameState: {
+          board: {
+            [PlayerColor.RED]: [13, 0, 0, 0],
+            [PlayerColor.GREEN]: [0, 0, 0, 0],
+            [PlayerColor.YELLOW]: [0, 0, 0, 0],
+            [PlayerColor.BLUE]: [0, 0, 0, 0],
+          },
+          currentPlayer: PlayerColor.RED,
+          playerAction: {
+            type: "move",
+            oldPosition: 10,
+            newPosition: 13,
+          },
+          winners: undefined,
+        },
+        nextTurn: 1,
+      } as any);
+
+      // Act
+      const result = await generateResult(data);
+
+      // Assert
+      expect(result.winners).toEqual([]);
     });
   });
 
