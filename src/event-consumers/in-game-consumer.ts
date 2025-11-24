@@ -23,7 +23,7 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
   async buildPayload(realPlayer: RealPlayer) {
     const user = await this.getUserInfo(realPlayer);
 
-    const { margin } = this.gameData.gameConfigs;
+    const { margin } = this.gameData.gameConfigs.odds;
     const { totalBets, roundId, exchangeRates } = this.gameData;
     const { session } = realPlayer;
     const rate = exchangeRates.code[session.currencyCode] * session.multiplier;
