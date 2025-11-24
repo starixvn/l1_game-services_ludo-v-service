@@ -1,6 +1,6 @@
 import { PlayerColor } from "@rd/ludo-rules";
-import { generateSettlementResult } from "./generate-settlement-result.js";
-import { IResult } from "../models/interfaces/result.js";
+import { generateSettlementResult } from "../../../src/helpers/generate-settlement-result.js";
+import { IResult } from "../../../src/models/interfaces/result.js";
 
 describe("generateSettlementResult", () => {
   const createMockResult = (

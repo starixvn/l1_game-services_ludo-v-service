@@ -9,6 +9,6 @@
     "moduleResolution": "Node",
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/unit-test/models/bet-schema.test.ts"],
   "exclude": ["node_modules", "dist"]
 }

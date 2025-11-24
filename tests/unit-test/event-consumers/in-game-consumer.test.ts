@@ -1,4 +1,4 @@
-import { InGameConsumer } from "./in-game-consumer.js";
+import { InGameConsumer } from "../../../src/event-consumers/in-game-consumer.js";
 
 describe("InGameConsumer", () => {
   test("should be defined", () => {

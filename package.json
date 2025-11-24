@@ -4,8 +4,10 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "test": "jest",
     "build": "tsc",
+    "reg": "npm set registry http://npm.lumigame.com",
+    "test": "jest --testPathPatterns=tests/unit-test/",
+    "test-coverage": "jest --collect-coverage --testPathPatterns=tests/unit-test/",
     "start": "node --max-old-space-size=8192 --import=extensionless/register ./dist/app.js"
   },
   "keywords": [],
