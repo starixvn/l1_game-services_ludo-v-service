@@ -67,7 +67,7 @@ export class GameCron extends Table.Crons.TableGameCron {
   }
 
   async calculateOdds() {
-    const { margin } = this.gameData.gameConfigs;
+    const { margin } = this.gameData.gameConfigs.odds;
     this.gameData.odds = await this.definition.generateOdds(
       margin,
       this.gameData.result,

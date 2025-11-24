@@ -6,9 +6,10 @@ import { Odds } from "./types.js";
 export default class GameData extends Table.TableGameData {
   declare gameConfigs: {
     gameId: number;
-    margin: number;
     enabled: boolean;
-    odds: Odds;
+    odds: {
+      margin: number;
+    };
     originalOdds: Odds;
     enableFreeBet: boolean;
     boostedChoices: boolean;

@@ -22,7 +22,7 @@ export class ProcessBetQueue extends Table.Crons.TableProcessBetQueue {
       odds: odds,
       roundId,
       clientSeed: bet.clientSeed,
-      margin: configs.margin,
+      margin: configs.odds.margin,
     } as any;
 
     // Transform bet record with interceptors
