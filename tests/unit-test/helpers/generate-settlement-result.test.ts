@@ -115,8 +115,8 @@ describe("generateSettlementResult", () => {
       });
       const settlement = generateSettlementResult(result);
 
-      expect(settlement.odd).toBe(true); // sum=6 is even, but code has inverted logic
-      expect(settlement.even).toBe(false);
+      expect(settlement.odd).toBe(false);
+      expect(settlement.even).toBe(true);
     });
 
     test("should return odd=true and even=false when dice sum is odd", () => {
@@ -128,8 +128,8 @@ describe("generateSettlementResult", () => {
       });
       const settlement = generateSettlementResult(result);
 
-      expect(settlement.odd).toBe(false); // sum=5 is odd, but code has inverted logic
-      expect(settlement.even).toBe(true);
+      expect(settlement.odd).toBe(true);
+      expect(settlement.even).toBe(false);
     });
 
     test("should handle minimum dice sum (2)", () => {

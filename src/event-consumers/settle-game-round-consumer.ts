@@ -1,5 +1,7 @@
 import { Table } from "sc-game-base";
 import GameData from "../game-data.js";
+import { IBet } from "../models/interfaces/bet.js";
+import { ISettlementResult } from "../models/interfaces/settlement-result.js";
 
 export class SettleGameRoundConsumer extends Table.EventConsumers
   .TableSettleGameRoundConsumer {
@@ -45,5 +47,47 @@ export class SettleGameRoundConsumer extends Table.EventConsumers
         this.gameData.winningPlayers,
       );
     }
+  }
+
+  calculateBetResult(
+    settlementResult: ISettlementResult,
+    bet: IBet,
+    odds: Record<string, number>,
+  ) {
+    const betResult = Object.entries(settlementResult).reduce(
+      (result, [choice, win]) => {
+        const betAmount = bet[choice as keyof IBet] ?? 0;
+        if (betAmount === 0) {
+          return result;
+        }
+        const originalOdds = odds[choice] || 1;
+        const effectiveOdds = bet.freeBet ? originalOdds - 1 : originalOdds;
+        const winAmount = win ? betAmount * effectiveOdds : 0;
+
+        result.totalBetAmount += betAmount;
+        result.totalWin += winAmount;
+        result.winningByChoices[choice] = winAmount;
+
+        if (winAmount > 0) {
+          result.netWin += winAmount - betAmount;
+        } else {
+          result.totalLost += betAmount;
+        }
+
+        return result;
+      },
+      {
+        totalBetAmount: 0,
+        totalWin: 0,
+        netWin: 0,
+        totalLost: 0,
+        winningByChoices: {} as Record<string, number>,
+      },
+    );
+
+    betResult.totalWin = parseFloat(betResult.totalWin.toFixed(2));
+    betResult.netWin = parseFloat(betResult.netWin.toFixed(2));
+
+    return betResult;
   }
 }

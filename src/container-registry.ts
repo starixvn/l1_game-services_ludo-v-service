@@ -8,7 +8,7 @@ import {
   RoundResultConsumer,
   SettleGameRoundConsumer,
 } from "./event-consumers/index.js";
-import { BetLogs, Bets, Rounds } from "./models/index.js";
+import { BetLogs, Bets, Rounds, TempBets } from "./models/index.js";
 
 export default class ContainerRegistry extends Table.TableContainerRegistry {
   registerModels(): void {
@@ -18,6 +18,7 @@ export default class ContainerRegistry extends Table.TableContainerRegistry {
       roundsRepository: asValue(Rounds),
       betsRepository: asValue(Bets),
       betLogsRepository: asValue(BetLogs),
+      tempBetsRepository: asValue(TempBets),
     });
   }
 
