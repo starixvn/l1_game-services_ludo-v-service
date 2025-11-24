@@ -50,15 +50,6 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
       },
     );
 
-    // roundHistory.forEach((round: any) => {
-    //   if (round.result && Array.isArray(round.result.dice)) {
-    //     round.result.dice = {
-    //       dice1: round.result.dice[0],
-    //       dice2: round.result.dice[1],
-    //     };
-    //   }
-    // });
-
     const payload = {
       roundId,
       gameConfigs,

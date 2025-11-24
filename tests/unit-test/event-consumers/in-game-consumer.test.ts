@@ -1,24 +1,386 @@
+import { PlayerColor } from "@rd/ludo-rules";
 import { InGameConsumer } from "../../../src/event-consumers/in-game-consumer.js";
+import GameData from "../../../src/game-data.js";
+import GameDefinition from "../../../src/game-definition.js";
+import { RoundQuery } from "../../../src/query-apis/round-query.js";
+import { RealPlayer } from "../../../src/types.js";
+
+// Mock sc-game-base to avoid constructor issues
+jest.mock("sc-game-base", () => {
+  const mockBaseClass = class MockTableInGameConsumer {
+    constructor() {}
+    getUserInfo = jest.fn();
+    buildPlayersPayload = jest.fn();
+    trackUserSignIn = jest.fn();
+  };
+
+  return {
+    Table: {
+      EventConsumers: {
+        TableInGameConsumer: mockBaseClass,
+      },
+      TableGameData: class MockTableGameData {
+        remainingTime: number;
+        roundId: number;
+        totalBets: any;
+        chips: any;
+        constructor(remainingTime: number) {
+          this.remainingTime = remainingTime;
+          this.roundId = 0;
+          this.totalBets = {};
+          this.chips = [];
+        }
+      },
+    },
+  };
+});
+
+// Mock dependencies
+jest.mock("../../../src/helpers/rule-bot-instance.js", () => ({
+  ruleBotInstance: {
+    move: jest.fn(),
+  },
+}));
+
+jest.mock("@rd/ludo-rules", () => ({
+  PlayerColor: {
+    RED: "red",
+    GREEN: "green",
+    YELLOW: "yellow",
+    BLUE: "blue",
+  },
+  getAllActionByBot: jest.fn().mockResolvedValue({
+    "0-1": { oldPosition: 0, newPosition: 1 },
+    "5-10": { oldPosition: 5, newPosition: 10 },
+  }),
+}));
 
 describe("InGameConsumer", () => {
-  test("should be defined", () => {
-    expect(InGameConsumer).toBeDefined();
+  describe("Class definition", () => {
+    test("should be defined", () => {
+      // Arrange & Act & Assert
+      expect(InGameConsumer).toBeDefined();
+    });
+
+    test("should extend from base class with required methods", () => {
+      // Arrange & Act
+      const hasRequiredMethods =
+        InGameConsumer.prototype.buildPayload !== undefined &&
+        InGameConsumer.prototype.generateRoundData !== undefined;
+
+      // Assert
+      expect(hasRequiredMethods).toBe(true);
+      expect(InGameConsumer.prototype.buildPayload).toBeDefined();
+      expect(InGameConsumer.prototype.generateRoundData).toBeDefined();
+    });
   });
 
-  test("should extend from base class", () => {
-    expect(InGameConsumer.prototype.buildPayload).toBeDefined();
-    expect(InGameConsumer.prototype.generateRoundData).toBeDefined();
+  describe("Method signatures", () => {
+    test("buildPayload should be an async function", () => {
+      // Arrange
+      const method = InGameConsumer.prototype.buildPayload;
+
+      // Act
+      const isAsync = method.constructor.name === "AsyncFunction";
+
+      // Assert
+      expect(method).toBeDefined();
+      expect(isAsync).toBe(true);
+    });
+
+    test("generateRoundData should be an async function", () => {
+      // Arrange
+      const method = InGameConsumer.prototype.generateRoundData;
+
+      // Act
+      const isAsync = method.constructor.name === "AsyncFunction";
+
+      // Assert
+      expect(method).toBeDefined();
+      expect(isAsync).toBe(true);
+    });
   });
 
-  test("should have async buildPayload method", () => {
-    const method = InGameConsumer.prototype.buildPayload;
-    expect(method).toBeDefined();
-    expect(method.constructor.name).toBe("AsyncFunction");
+  describe("generateRoundData", () => {
+    let consumer: InGameConsumer;
+    let mockGameData: GameData;
+
+    beforeEach(() => {
+      // Arrange - Create fresh instances for each test
+      consumer = Object.create(InGameConsumer.prototype);
+      mockGameData = new GameData(30000);
+      mockGameData.result = {
+        board: {
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [5, 10, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [3, 4],
+        action: {
+          oldPosition: 0,
+          newPosition: 7,
+          playerColor: PlayerColor.RED,
+          type: "move",
+        },
+      };
+      mockGameData.roundId = 5;
+      mockGameData.initRoundId = 1;
+      consumer.gameData = mockGameData;
+    });
+
+    test("should generate round data with board state and current turn count", async () => {
+      // Act
+      const roundData = await consumer.generateRoundData();
+
+      // Assert
+      expect(roundData).toBeDefined();
+      expect(roundData.board).toEqual(mockGameData.result.board);
+      expect(roundData.currentTurnCount).toBe(4); // roundId (5) - initRoundId (1) = 4
+      expect(roundData.action).toEqual(mockGameData.result.action);
+    });
+
+    test("should include next player color based on turn index", async () => {
+      // Act
+      const roundData = await consumer.generateRoundData();
+
+      // Assert
+      expect(roundData.nextPlayerColor).toBe(PlayerColor.RED);
+    });
+
+    test("should include possible actions from bot calculation", async () => {
+      // Act
+      const roundData = await consumer.generateRoundData();
+
+      // Assert
+      expect(roundData.possibleActions).toBeDefined();
+      expect(Array.isArray(roundData.possibleActions)).toBe(true);
+      expect(roundData.possibleActions).toEqual([
+        { oldPosition: 0, newPosition: 1 },
+        { oldPosition: 5, newPosition: 10 },
+      ]);
+    });
+
+    test("should calculate next player color for different turn indices", async () => {
+      // Arrange
+      mockGameData.result.nextTurnIndex = 2;
+
+      // Act
+      const roundData = await consumer.generateRoundData();
+
+      // Assert
+      expect(roundData.nextPlayerColor).toBe(PlayerColor.YELLOW);
+    });
   });
 
-  test("should have async generateRoundData method", () => {
-    const method = InGameConsumer.prototype.generateRoundData;
-    expect(method).toBeDefined();
-    expect(method.constructor.name).toBe("AsyncFunction");
+  describe("buildPayload", () => {
+    let consumer: InGameConsumer;
+    let mockGameData: GameData;
+    let mockDefinition: GameDefinition;
+    let mockRoundQuery: RoundQuery;
+    let mockRealPlayer: RealPlayer;
+
+    beforeEach(() => {
+      // Arrange - Set up all mocks
+      consumer = Object.create(InGameConsumer.prototype);
+      mockGameData = new GameData(30000);
+      mockGameData.roundId = 10;
+      mockGameData.gameConfigs = {
+        gameId: 1,
+        enabled: true,
+        odds: { margin: 0.05 },
+        originalOdds: {} as any,
+        enableFreeBet: false,
+        boostedChoices: false,
+      };
+      mockGameData.totalBets = { big: 100, small: 200 } as any;
+      mockGameData.exchangeRates = {
+        exId: 1,
+        code: { USD: 1, EUR: 0.85 },
+      };
+      mockGameData.currencyGroupGames = [
+        { groupId: 1, name: "Group 1" },
+      ] as any;
+      mockGameData.odds = {} as any;
+      mockGameData.chips = [10, 50, 100] as any;
+      mockGameData.remainingTime = 25000;
+      mockGameData.ingame = {
+        testPlayer: {
+          ownBets: { big: 50, small: 30 },
+          clientSeed: "seed123",
+        },
+      };
+      mockGameData.result = {
+        board: {
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [],
+        action: {
+          oldPosition: 0,
+          newPosition: 0,
+          playerColor: PlayerColor.RED,
+          type: "skip",
+        },
+      };
+
+      mockDefinition = { numberOfRoundHistory: 10 } as any;
+      mockRoundQuery = {
+        getList: jest.fn().mockResolvedValue([
+          { id: 1, result: { dice1: 3, dice2: 4 } },
+          { id: 2, result: { dice1: 5, dice2: 2 } },
+        ]),
+      } as any;
+
+      mockRealPlayer = {
+        profile: { name: "testPlayer" },
+        session: {
+          currencyCode: "USD",
+          multiplier: 1,
+          currencyGroupId: "1",
+          system: "Web",
+        },
+      } as any;
+
+      consumer.gameData = mockGameData;
+      consumer.definition = mockDefinition;
+      consumer.roundQuery = mockRoundQuery;
+      consumer.getUserInfo = jest.fn().mockResolvedValue({
+        userId: 123,
+        username: "testPlayer",
+        balance: 1000,
+      });
+      consumer.buildPlayersPayload = jest.fn().mockReturnValue({});
+      consumer.generateRoundData = jest.fn().mockResolvedValue({
+        board: mockGameData.result.board,
+        currentTurnCount: 5,
+        action: mockGameData.result.action,
+        nextPlayerColor: PlayerColor.RED,
+        possibleActions: [],
+      });
+    });
+
+    test("should build complete payload with all required fields", async () => {
+      // Act
+      const payload = await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(payload).toBeDefined();
+      expect(payload.roundId).toBe(10);
+      expect(payload.gameConfigs).toBeDefined();
+      expect(payload.roundHistory).toBeDefined();
+      expect(payload.ownBets).toEqual({ big: 50, small: 30 });
+      expect(payload.roundData).toBeDefined();
+      expect(payload.totalBets).toBeDefined();
+      expect(payload.user).toBeDefined();
+    });
+
+    test("should call getUserInfo with correct parameters", async () => {
+      // Act
+      await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(consumer.getUserInfo).toHaveBeenCalledWith(mockRealPlayer);
+      expect(consumer.getUserInfo).toHaveBeenCalledTimes(1);
+    });
+
+    test("should fetch round history with correct limit", async () => {
+      // Act
+      await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(mockRoundQuery.getList).toHaveBeenCalledWith(10, {
+        id: 1,
+        result: {
+          dice1: { $arrayElemAt: ["$result.dice", 0] },
+          dice2: { $arrayElemAt: ["$result.dice", 1] },
+        },
+      });
+    });
+
+    test("should calculate user rate correctly", async () => {
+      // Act
+      const payload = await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(payload.user.rate).toBe(1); // USD rate (1) * multiplier (1)
+    });
+
+    test("should handle different currency rates", async () => {
+      // Arrange
+      mockRealPlayer.session.currencyCode = "EUR";
+
+      // Act
+      const payload = await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(payload.user.rate).toBe(0.85);
+    });
+
+    test("should include promotion when available and no promotionTOProgress", async () => {
+      // Arrange
+      mockRealPlayer.promotion = {
+        promotionId: "promo123",
+        name: "Test Promo",
+      };
+
+      // Act
+      const payload = await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(payload.promotion).toEqual(mockRealPlayer.promotion);
+    });
+
+    test("should include promotionTOProgress when available", async () => {
+      // Arrange
+      mockRealPlayer.promotionTOProgress = {
+        totalTurnover: 500,
+        minRequiredTurnover: 1000,
+        remainingTO: 500,
+        progressPercentage: 50,
+        canClaim: false,
+        totalWinAmount: 100,
+        claimExpirationDate: new Date("2025-12-31"),
+      };
+      mockRealPlayer.promotion = { promotionId: "promo123" };
+
+      // Act
+      const payload = await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(payload.promotionTOProgress).toBeDefined();
+      expect(payload.promotionTOProgress.totalTO).toBe(500);
+      expect(payload.promotionTOProgress.progress).toBe(50);
+      expect(payload.promotionTOProgress.promotionId).toBe("promo123");
+    });
+
+    test("should handle empty ownBets when player not in ingame", async () => {
+      // Arrange
+      mockRealPlayer.profile.name = "newPlayer";
+
+      // Act
+      const payload = await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(payload.ownBets).toEqual({});
+    });
   });
 });
