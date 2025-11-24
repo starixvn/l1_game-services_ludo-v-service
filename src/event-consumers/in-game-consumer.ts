@@ -43,9 +43,21 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
       this.definition.numberOfRoundHistory,
       {
         id: 1,
-        "result.dice": 1,
+        result: {
+          dice1: { $arrayElemAt: ["$result.dice", 0] },
+          dice2: { $arrayElemAt: ["$result.dice", 1] },
+        },
       },
     );
+
+    // roundHistory.forEach((round: any) => {
+    //   if (round.result && Array.isArray(round.result.dice)) {
+    //     round.result.dice = {
+    //       dice1: round.result.dice[0],
+    //       dice2: round.result.dice[1],
+    //     };
+    //   }
+    // });
 
     const payload = {
       roundId,

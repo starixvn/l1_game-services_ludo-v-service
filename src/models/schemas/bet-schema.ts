@@ -1,34 +1,11 @@
 import mongoose from "mongoose";
 import { IBet } from "../interfaces/bet.js";
+import { tempBetSchema } from "./temp-bet-schema.js";
 
 export const betSchema = new mongoose.Schema<IBet>({
-  uid: { type: String, required: true },
-  name: { type: String, required: true },
-  big: { type: Number },
-  small: { type: Number },
-  odd: { type: Number },
-  even: { type: Number },
-  kick: { type: Number },
-  move: { type: Number },
-  release: { type: Number },
-  goStable: { type: Number },
-  noStable: { type: Number },
-  noKick: { type: Number },
-  noMove: { type: Number },
-  noRelease: { type: Number },
   totalAmount: { type: Number, required: true },
-  betwin: { type: Number, required: true },
-  time: { type: Date, required: true },
-  odds: { type: Object, required: true },
-  freeBet: { type: Boolean, default: false },
-  roundId: { type: Number, required: true },
-  paid: { type: Boolean, default: false },
   currency: { type: String, required: true },
-  playerId: { type: String, required: true },
-  siteId: { type: String, required: true },
   rate: { type: Number, required: true },
-  operatorId: { type: String, required: true },
-  reachMaxWin: { type: Boolean, default: false },
-  maxWin: { type: Number, default: 0 },
-  margin: { type: Number, required: true },
 });
+
+betSchema.add(tempBetSchema);
