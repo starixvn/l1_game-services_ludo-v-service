@@ -32,11 +32,7 @@ export class RoundConsumer {
 
   async initNewRound() {
     const lastRound = await this.roundsRepository
-      .findOne(
-        {},
-        { id: 1, result: 1, currentTurn: 1, initRoundId: 1 },
-        { sort: { id: -1 } },
-      )
+      .findOne({}, { id: 1, result: 1, initRoundId: 1 }, { sort: { id: -1 } })
       .lean()
       .exec();
 

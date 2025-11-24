@@ -441,7 +441,6 @@ describe("GameData", () => {
         winners: [PlayerColor.RED],
         dice: [6, 5],
         action: {
-          type: "move",
           oldPosition: 30,
           newPosition: 41,
           playerColor: PlayerColor.RED,
@@ -486,7 +485,6 @@ describe("GameData", () => {
       gameData.roundId = 1;
       gameData.result.dice = [3, 4];
       gameData.result.action = {
-        type: "move",
         oldPosition: 0,
         newPosition: 7,
         playerColor: PlayerColor.RED,

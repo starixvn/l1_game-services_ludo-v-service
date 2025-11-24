@@ -1,7 +1,6 @@
 import { PlayerColor } from "@rd/ludo-rules";
 import { GameCron } from "../../../src/crons/game-cron.js";
 import GameData from "../../../src/game-data.js";
-import GameDefinition from "../../../src/game-definition.js";
 
 // Mock sc-game-base to avoid constructor issues
 jest.mock("sc-game-base", () => {
@@ -666,7 +665,7 @@ describe("GameCron", () => {
       // Arrange
       const mockDeps = createMockDependencies();
       const gameCron = new GameCron(mockDeps);
-      gameCron.bot = null;
+      gameCron.bot = null as any;
       gameCron.gameData.remainingTime = 15000;
       gameCron.gameData.disabled = false;
       gameCron.definition.durations = {

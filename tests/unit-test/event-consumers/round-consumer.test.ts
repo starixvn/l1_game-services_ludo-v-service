@@ -1,7 +1,7 @@
 import { PlayerColor } from "@rd/ludo-rules";
+import mongoose from "mongoose";
 import { RoundConsumer } from "../../../src/event-consumers/round-consumer.js";
 import GameData from "../../../src/game-data.js";
-import GameDefinition from "../../../src/game-definition.js";
 import { IRound } from "../../../src/models/interfaces/round.js";
 
 // Mock sc-game-base
@@ -135,10 +135,9 @@ describe("RoundConsumer", () => {
               playerColor: PlayerColor.RED,
             },
           },
-          currentTurn: 5,
           initRoundId: 1,
         };
-        mockDeps.roundsRepository.findOne.mockReturnValue({
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
           lean: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue(mockLastRound),
           }),
@@ -178,10 +177,9 @@ describe("RoundConsumer", () => {
               playerColor: PlayerColor.RED,
             },
           },
-          currentTurn: 3,
           initRoundId: 1,
         };
-        mockDeps.roundsRepository.findOne.mockReturnValue({
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
           lean: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue(mockLastRound),
           }),
@@ -217,10 +215,9 @@ describe("RoundConsumer", () => {
               playerColor: PlayerColor.RED,
             },
           },
-          currentTurn: 15,
           initRoundId: 5,
         };
-        mockDeps.roundsRepository.findOne.mockReturnValue({
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
           lean: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue(mockLastRound),
           }),
@@ -256,10 +253,9 @@ describe("RoundConsumer", () => {
               playerColor: PlayerColor.RED,
             },
           },
-          currentTurn: 8,
           initRoundId: 5,
         };
-        mockDeps.roundsRepository.findOne.mockReturnValue({
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
           lean: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue(mockLastRound),
           }),
@@ -295,10 +291,9 @@ describe("RoundConsumer", () => {
               playerColor: PlayerColor.RED,
             },
           },
-          currentTurn: 1,
           initRoundId: 1,
         };
-        mockDeps.roundsRepository.findOne.mockReturnValue({
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
           lean: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue(mockLastRound),
           }),
@@ -310,7 +305,7 @@ describe("RoundConsumer", () => {
         // Assert
         expect(mockDeps.roundsRepository.findOne).toHaveBeenCalledWith(
           {},
-          { id: 1, result: 1, currentTurn: 1, initRoundId: 1 },
+          { id: 1, result: 1, initRoundId: 1 },
           { sort: { id: -1 } },
         );
       });
@@ -321,7 +316,7 @@ describe("RoundConsumer", () => {
         // Arrange
         const mockDeps = createMockDependencies();
         const consumer = new RoundConsumer(mockDeps);
-        mockDeps.roundsRepository.findOne.mockReturnValue({
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
           lean: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue(null),
           }),
@@ -344,7 +339,7 @@ describe("RoundConsumer", () => {
         // Arrange
         const mockDeps = createMockDependencies();
         const consumer = new RoundConsumer(mockDeps);
-        mockDeps.roundsRepository.findOne.mockReturnValue({
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
           lean: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue(null),
           }),
@@ -372,7 +367,7 @@ describe("RoundConsumer", () => {
         // Arrange
         const mockDeps = createMockDependencies();
         const consumer = new RoundConsumer(mockDeps);
-        mockDeps.roundsRepository.findOne.mockReturnValue({
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
           lean: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue(null),
           }),
@@ -400,7 +395,7 @@ describe("RoundConsumer", () => {
         // Arrange
         const mockDeps = createMockDependencies();
         const consumer = new RoundConsumer(mockDeps);
-        mockDeps.roundsRepository.findOne.mockReturnValue({
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
           lean: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue(null),
           }),
@@ -423,7 +418,7 @@ describe("RoundConsumer", () => {
         // Arrange
         const mockDeps = createMockDependencies();
         const consumer = new RoundConsumer(mockDeps);
-        mockDeps.roundsRepository.findOne.mockReturnValue({
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
           lean: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue(null),
           }),
@@ -447,7 +442,7 @@ describe("RoundConsumer", () => {
         // Arrange
         const mockDeps = createMockDependencies();
         const consumer = new RoundConsumer(mockDeps);
-        mockDeps.roundsRepository.findOne.mockReturnValue({
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
           lean: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue(null),
           }),
@@ -554,9 +549,13 @@ describe("RoundConsumer", () => {
       const mockGetArchiveStatus = jest.fn().mockResolvedValue({
         lastArcId: { _rounds: 100 },
       });
-      consumer.gameManagementApiClient.archiveStatus = {
-        getArchiveStatus: mockGetArchiveStatus,
-      };
+      Object.defineProperty(consumer.gameManagementApiClient, "archiveStatus", {
+        value: {
+          getArchiveStatus: mockGetArchiveStatus,
+        },
+        writable: true,
+        configurable: true,
+      });
       getOrDefault.mockImplementation((promise) => promise);
 
       // Act
@@ -614,10 +613,9 @@ describe("RoundConsumer", () => {
             playerColor: PlayerColor.RED,
           },
         },
-        currentTurn: 12,
         initRoundId: 10,
       };
-      mockDeps.roundsRepository.findOne.mockReturnValue({
+      (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
         lean: jest.fn().mockReturnValue({
           exec: jest.fn().mockResolvedValue(mockLastRound),
         }),
@@ -636,7 +634,7 @@ describe("RoundConsumer", () => {
       // Arrange
       const mockDeps = createMockDependencies();
       const consumer = new RoundConsumer(mockDeps);
-      mockDeps.roundsRepository.findOne.mockReturnValue({
+      (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
         lean: jest.fn().mockReturnValue({
           exec: jest.fn().mockResolvedValue(null),
         }),
@@ -670,9 +668,11 @@ describe("RoundConsumer", () => {
       // Arrange
       const mockDeps = createMockDependencies();
       const consumer = new RoundConsumer(mockDeps);
-      mockDeps.roundsRepository.findOne.mockImplementation(() => {
-        throw new Error("Database error");
-      });
+      (mockDeps.roundsRepository.findOne as jest.Mock).mockImplementation(
+        () => {
+          throw new Error("Database error");
+        },
+      );
 
       // Act & Assert
       await expect(consumer.initNewRound()).rejects.toThrow("Database error");
@@ -701,10 +701,9 @@ describe("RoundConsumer", () => {
             playerColor: PlayerColor.RED,
           },
         },
-        currentTurn: 1,
         initRoundId: 0,
       };
-      mockDeps.roundsRepository.findOne.mockReturnValue({
+      (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
         lean: jest.fn().mockReturnValue({
           exec: jest.fn().mockResolvedValue(mockLastRound),
         }),
@@ -740,10 +739,9 @@ describe("RoundConsumer", () => {
             playerColor: PlayerColor.RED,
           },
         },
-        currentTurn: 1,
         initRoundId: 999999,
       };
-      mockDeps.roundsRepository.findOne.mockReturnValue({
+      (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
         lean: jest.fn().mockReturnValue({
           exec: jest.fn().mockResolvedValue(mockLastRound),
         }),
@@ -779,10 +777,9 @@ describe("RoundConsumer", () => {
             playerColor: PlayerColor.GREEN,
           },
         },
-        currentTurn: 20,
         initRoundId: 30,
       };
-      mockDeps.roundsRepository.findOne.mockReturnValue({
+      (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
         lean: jest.fn().mockReturnValue({
           exec: jest.fn().mockResolvedValue(mockLastRound),
         }),
@@ -819,10 +816,9 @@ describe("RoundConsumer", () => {
             playerColor: PlayerColor.RED,
           },
         },
-        currentTurn: 5,
         initRoundId: 5,
       };
-      mockDeps.roundsRepository.findOne.mockReturnValue({
+      (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
         lean: jest.fn().mockReturnValue({
           exec: jest.fn().mockResolvedValue(mockLastRound),
         }),
@@ -866,7 +862,7 @@ function createMockDependencies() {
 
   const mockRoundsRepository = {
     findOne: jest.fn(),
-  };
+  } as any;
 
   const mockGameManagementApiClientFactory = {
     instance: jest.fn().mockReturnValue({
@@ -879,7 +875,7 @@ function createMockDependencies() {
   return {
     gameData: mockGameData,
     definition: mockDefinition,
-    roundsRepository: mockRoundsRepository,
+    roundsRepository: mockRoundsRepository as mongoose.Model<IRound>,
     gameManagementApiClientFactory: mockGameManagementApiClientFactory,
   };
 }

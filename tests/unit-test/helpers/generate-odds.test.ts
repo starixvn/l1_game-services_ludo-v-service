@@ -1,7 +1,7 @@
-import { PlayerColor, DiceState, getActions } from "@rd/ludo-rules";
+import { DiceState, getActions, PlayerColor } from "@rd/ludo-rules";
 import { generateOdds } from "../../../src/helpers/generate-odds.js";
-import { IResult } from "../../../src/models/interfaces/result.js";
 import { ruleBotInstance } from "../../../src/helpers/rule-bot-instance.js";
+import { IResult } from "../../../src/models/interfaces/result.js";
 
 // Mock dependencies
 jest.mock("@rd/ludo-rules", () => ({
@@ -28,10 +28,10 @@ jest.mock("../../../src/helpers/rule-bot-instance.js", () => ({
 
 import {
   getRaceMap,
-  isSkipAction,
-  isReleaseAction,
   isGoToStableAction,
   isKickAction,
+  isReleaseAction,
+  isSkipAction,
 } from "@rd/ludo-rules";
 
 describe("generateOdds", () => {
@@ -79,7 +79,6 @@ describe("generateOdds", () => {
       ],
       winners: [],
       action: {
-        type: "skip",
         oldPosition: 0,
         newPosition: 0,
         playerColor: PlayerColor.RED,
@@ -92,7 +91,6 @@ describe("generateOdds", () => {
     mockGetActions.mockReturnValue([]);
     (DiceState as jest.Mock).mockImplementation((dice) => ({ dice }));
     mockRuleBotMove.mockResolvedValue({
-      type: "skip",
       oldPosition: 0,
       newPosition: 0,
     });
@@ -246,7 +244,6 @@ describe("generateOdds", () => {
       // Arrange
       mockIsSkipAction.mockReturnValue(false); // All 36 combinations result in move
       mockRuleBotMove.mockResolvedValue({
-        type: "move",
         oldPosition: 0,
         newPosition: 5,
       });
@@ -263,7 +260,6 @@ describe("generateOdds", () => {
       // Arrange
       mockIsSkipAction.mockReturnValue(true); // All 36 combinations result in skip
       mockRuleBotMove.mockResolvedValue({
-        type: "skip",
         oldPosition: 0,
         newPosition: 0,
       });

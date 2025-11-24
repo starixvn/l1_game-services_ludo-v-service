@@ -129,7 +129,6 @@ describe("InGameConsumer", () => {
           oldPosition: 0,
           newPosition: 7,
           playerColor: PlayerColor.RED,
-          type: "move",
         },
       };
       mockGameData.roundId = 5;
@@ -238,7 +237,6 @@ describe("InGameConsumer", () => {
           oldPosition: 0,
           newPosition: 0,
           playerColor: PlayerColor.RED,
-          type: "skip",
         },
       };
 
@@ -339,7 +337,7 @@ describe("InGameConsumer", () => {
       // Arrange
       mockRealPlayer.promotion = {
         promotionId: "promo123",
-        name: "Test Promo",
+        promotionName: "Test Promo",
       };
 
       // Act
@@ -360,7 +358,10 @@ describe("InGameConsumer", () => {
         totalWinAmount: 100,
         claimExpirationDate: new Date("2025-12-31"),
       };
-      mockRealPlayer.promotion = { promotionId: "promo123" };
+      mockRealPlayer.promotion = {
+        promotionId: "promo123",
+        promotionName: "Test Promo",
+      };
 
       // Act
       const payload = await consumer.buildPayload(mockRealPlayer);

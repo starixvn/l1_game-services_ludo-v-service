@@ -1,8 +1,10 @@
 import { PlayerColor } from "@rd/ludo-rules";
+import mongoose from "mongoose";
 import { SettleGameRoundConsumer } from "../../../src/event-consumers/settle-game-round-consumer.js";
 import GameData from "../../../src/game-data.js";
 import { IBet } from "../../../src/models/interfaces/bet.js";
 import { IResult } from "../../../src/models/interfaces/result.js";
+import { IRound } from "../../../src/models/interfaces/round.js";
 import { ISettlementResult } from "../../../src/models/interfaces/settlement-result.js";
 
 // Mock sc-game-base to avoid constructor issues
@@ -822,7 +824,9 @@ describe("SettleGameRoundConsumer", () => {
         time: new Date(),
         exchangeRateId: 1,
       };
-      mockDeps.roundsRepository.create.mockResolvedValue(mockNewRound);
+      (mockDeps.roundsRepository.create as jest.Mock).mockResolvedValue(
+        mockNewRound,
+      );
 
       // Act
       await consumer.settleRound();
@@ -887,7 +891,9 @@ describe("SettleGameRoundConsumer", () => {
         settlementResult: mockSettlementResult,
         time: new Date(),
       };
-      mockDeps.roundsRepository.create.mockResolvedValue(mockNewRound);
+      (mockDeps.roundsRepository.create as jest.Mock).mockResolvedValue(
+        mockNewRound,
+      );
 
       // Act
       await consumer.settleRound();
@@ -920,7 +926,9 @@ describe("SettleGameRoundConsumer", () => {
       consumer.gameData.roundId = 10;
       consumer.gameData.exchangeRates = { exId: 1, code: { USD: 1 } };
       const mockNewRound = { id: 10, time: new Date() };
-      mockDeps.roundsRepository.create.mockResolvedValue(mockNewRound);
+      (mockDeps.roundsRepository.create as jest.Mock).mockResolvedValue(
+        mockNewRound,
+      );
 
       // Act
       await consumer.settleRound();
@@ -956,7 +964,9 @@ describe("SettleGameRoundConsumer", () => {
       consumer.gameData.initRoundId = 5;
       consumer.gameData.exchangeRates = { exId: 1, code: { USD: 1 } };
       const mockNewRound = { id: 10, time: new Date() };
-      mockDeps.roundsRepository.create.mockResolvedValue(mockNewRound);
+      (mockDeps.roundsRepository.create as jest.Mock).mockResolvedValue(
+        mockNewRound,
+      );
 
       // Act
       await consumer.settleRound();
@@ -993,7 +1003,9 @@ describe("SettleGameRoundConsumer", () => {
       consumer.gameData.initRoundId = 5;
       consumer.gameData.exchangeRates = { exId: 1, code: { USD: 1 } };
       const mockNewRound = { id: 10, time: new Date() };
-      mockDeps.roundsRepository.create.mockResolvedValue(mockNewRound);
+      (mockDeps.roundsRepository.create as jest.Mock).mockResolvedValue(
+        mockNewRound,
+      );
 
       // Act
       await consumer.settleRound();
@@ -1021,7 +1033,9 @@ describe("SettleGameRoundConsumer", () => {
       consumer.gameData.exchangeRates = { exId: 1, code: { USD: 1 } };
       const mockTime = new Date();
       const mockNewRound = { id: 10, time: mockTime };
-      mockDeps.roundsRepository.create.mockResolvedValue(mockNewRound);
+      (mockDeps.roundsRepository.create as jest.Mock).mockResolvedValue(
+        mockNewRound,
+      );
 
       // Act
       await consumer.settleRound();
@@ -1051,7 +1065,9 @@ describe("SettleGameRoundConsumer", () => {
         { name: "Player1", winAmount: 500 },
       ] as any;
       const mockNewRound = { id: 10, time: new Date() };
-      mockDeps.roundsRepository.create.mockResolvedValue(mockNewRound);
+      (mockDeps.roundsRepository.create as jest.Mock).mockResolvedValue(
+        mockNewRound,
+      );
 
       // Act
       await consumer.settleRound();
@@ -1075,7 +1091,7 @@ describe("SettleGameRoundConsumer", () => {
       mockDeps.definition.settle = jest.fn().mockReturnValue({});
       consumer.gameData.roundId = 10;
       consumer.gameData.exchangeRates = { exId: 1, code: { USD: 1 } };
-      mockDeps.roundsRepository.create.mockResolvedValue(null);
+      (mockDeps.roundsRepository.create as jest.Mock).mockResolvedValue(null);
 
       // Act
       await consumer.settleRound();
@@ -1337,17 +1353,31 @@ function createMockDependencies() {
 
   const mockRoundsRepository = {
     create: jest.fn(),
-  };
+  } as any;
+
+  const mockBetsRepository = {} as any;
+
+  const mockTempBetsRepository = {} as any;
 
   const mockRoundResultPublisher = {
     publishRoundResult: jest.fn(),
     publishWinners: jest.fn(),
-  };
+  } as any;
+
+  const mockUserBetResultPublisher = {
+    publishUserBetResult: jest.fn(),
+  } as any;
+
+  const mockEndGame = jest.fn();
 
   return {
     gameData: mockGameData,
     definition: mockDefinition,
-    roundsRepository: mockRoundsRepository,
+    roundsRepository: mockRoundsRepository as mongoose.Model<IRound>,
+    betsRepository: mockBetsRepository,
+    tempBetsRepository: mockTempBetsRepository,
     roundResultPublisher: mockRoundResultPublisher,
+    userBetResultPublisher: mockUserBetResultPublisher,
+    endGame: mockEndGame,
   };
 }
