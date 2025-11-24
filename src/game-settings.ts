@@ -3,9 +3,9 @@ import { ODDS_KEYS } from "./constants.js";
 export default {
   id: 163,
   durations: {
-    wholeRound: 10,
-    placingBets: 8,
-    lockingBet: 2,
+    wholeRound: 32,
+    placingBets: 31,
+    lockingBet: 14,
   },
   name: "ludo",
   choices: ODDS_KEYS,
