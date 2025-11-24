@@ -55,7 +55,7 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
       gameConfigs,
       roundHistory,
       ownBets,
-      currentGameState: await this.generateRoundData(),
+      gameState: await this.generateGameState(),
       totalBets,
       user: { ...user, rate },
     } as any;
@@ -93,7 +93,7 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
       : { ...payload, remainingTime, players, chips };
   }
 
-  async generateRoundData() {
+  async generateGameState() {
     const nextPlayerColor =
       this.gameData.result.currentPlayers[this.gameData.result.nextTurnIndex];
     const possibleActionSet = await getAllActionByBot(

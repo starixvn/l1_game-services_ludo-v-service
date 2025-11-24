@@ -66,12 +66,12 @@ describe("InGameConsumer", () => {
       // Arrange & Act
       const hasRequiredMethods =
         InGameConsumer.prototype.buildPayload !== undefined &&
-        InGameConsumer.prototype.generateRoundData !== undefined;
+        InGameConsumer.prototype.generateGameState !== undefined;
 
       // Assert
       expect(hasRequiredMethods).toBe(true);
       expect(InGameConsumer.prototype.buildPayload).toBeDefined();
-      expect(InGameConsumer.prototype.generateRoundData).toBeDefined();
+      expect(InGameConsumer.prototype.generateGameState).toBeDefined();
     });
   });
 
@@ -90,7 +90,7 @@ describe("InGameConsumer", () => {
 
     test("generateRoundData should be an async function", () => {
       // Arrange
-      const method = InGameConsumer.prototype.generateRoundData;
+      const method = InGameConsumer.prototype.generateGameState;
 
       // Act
       const isAsync = method.constructor.name === "AsyncFunction";
@@ -139,7 +139,7 @@ describe("InGameConsumer", () => {
 
     test("should generate round data with board state and current turn count", async () => {
       // Act
-      const roundData = await consumer.generateRoundData();
+      const roundData = await consumer.generateGameState();
 
       // Assert
       expect(roundData).toBeDefined();
@@ -150,7 +150,7 @@ describe("InGameConsumer", () => {
 
     test("should include next player color based on turn index", async () => {
       // Act
-      const roundData = await consumer.generateRoundData();
+      const roundData = await consumer.generateGameState();
 
       // Assert
       expect(roundData.nextPlayerColor).toBe(PlayerColor.RED);
@@ -158,7 +158,7 @@ describe("InGameConsumer", () => {
 
     test("should include possible actions from bot calculation", async () => {
       // Act
-      const roundData = await consumer.generateRoundData();
+      const roundData = await consumer.generateGameState();
 
       // Assert
       expect(roundData.possibleActions).toBeDefined();
@@ -174,7 +174,7 @@ describe("InGameConsumer", () => {
       mockGameData.result.nextTurnIndex = 2;
 
       // Act
-      const roundData = await consumer.generateRoundData();
+      const roundData = await consumer.generateGameState();
 
       // Assert
       expect(roundData.nextPlayerColor).toBe(PlayerColor.YELLOW);
@@ -269,7 +269,7 @@ describe("InGameConsumer", () => {
         balance: 1000,
       });
       consumer.buildPlayersPayload = jest.fn().mockReturnValue({});
-      consumer.generateRoundData = jest.fn().mockResolvedValue({
+      consumer.generateGameState = jest.fn().mockResolvedValue({
         board: mockGameData.result.board,
         currentTurnCount: 5,
         action: mockGameData.result.action,
@@ -288,7 +288,7 @@ describe("InGameConsumer", () => {
       expect(payload.gameConfigs).toBeDefined();
       expect(payload.roundHistory).toBeDefined();
       expect(payload.ownBets).toEqual({ big: 50, small: 30 });
-      expect(payload.currentGameState).toBeDefined();
+      expect(payload.gameState).toBeDefined();
       expect(payload.totalBets).toBeDefined();
       expect(payload.user).toBeDefined();
     });
