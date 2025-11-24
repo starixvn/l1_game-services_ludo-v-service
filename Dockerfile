@@ -23,4 +23,4 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/yarn.lock ./
 
 EXPOSE 5000
-CMD [ "node", "--import=extensionless/register","./app.js" ]
+CMD [ "node", "--import=extensionless/register","./dist/app.js" ]
