@@ -11,7 +11,6 @@ export class RunningRoundInfoPublisher extends Core.BaseEventPublishers
     const possibleActions = await getPossibleActions(this.gameData);
     this.publishToAllUsers({
       nextState: {
-        odds,
         currentTurnCount: this.gameData.roundId - this.gameData.initRoundId,
         nextAction: {
           nextPlayer:
@@ -21,6 +20,7 @@ export class RunningRoundInfoPublisher extends Core.BaseEventPublishers
           possibleActions,
         },
       },
+      odds,
     });
   }
 }
