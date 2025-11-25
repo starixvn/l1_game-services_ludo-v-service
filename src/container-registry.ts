@@ -4,11 +4,12 @@ import { GameCron } from "./crons/game-cron.js";
 import { ProcessBetQueue } from "./crons/process-bet-queue.js";
 import {
   InGameConsumer,
+  PlaceBetConsumer,
   RoundConsumer,
   RoundResultConsumer,
   SettleGameRoundConsumer,
 } from "./event-consumers/index.js";
-import { GameStatusPublisher } from "./event-publishers/index.js";
+import { RunningRoundInfoPublisher } from "./event-publishers/index.js";
 import { BetLogs, Bets, Rounds, TempBets } from "./models/index.js";
 
 export default class ContainerRegistry extends Table.TableContainerRegistry {
@@ -28,6 +29,7 @@ export default class ContainerRegistry extends Table.TableContainerRegistry {
 
     this.container.register({
       inGameConsumer: asClass(InGameConsumer).singleton(),
+      placeBetConsumer: asClass(PlaceBetConsumer).singleton(),
       roundConsumer: asClass(RoundConsumer).singleton().proxy(),
       roundResultConsumer: asClass(RoundResultConsumer).singleton(),
       settleGameRoundConsumer: asClass(SettleGameRoundConsumer)
@@ -49,7 +51,7 @@ export default class ContainerRegistry extends Table.TableContainerRegistry {
     super.registerPublishers();
 
     this.container.register({
-      gameStatusPublisher: asClass(GameStatusPublisher).singleton(),
+      runningRoundInfoPublisher: asClass(RunningRoundInfoPublisher).singleton(),
     });
   }
 }

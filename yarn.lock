@@ -2292,6 +2292,11 @@
   resolved "https://npm.lumigame.com/@types/range-parser/-/range-parser-1.2.7.tgz#50ae4353eaaddc04044279812f52c8c65857dbcb"
   integrity sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==
 
+"@types/sc-common@^1.0.2":
+  version "1.0.2"
+  resolved "https://npm.lumigame.com/@types/sc-common/-/sc-common-1.0.2.tgz#6859c5f010b9e0bbd3ea05980187956173902fca"
+  integrity sha512-SJr/wgiGyNnzNhfxBd1ppDWZV5s/O9SHuKSSxWTxk4MzV7JX4jvyN/6opDpYdmnWwJP4aOhFEttaGWErD2V8Ew==
+
 "@types/send@*":
   version "1.2.1"
   resolved "https://npm.lumigame.com/@types/send/-/send-1.2.1.tgz#6a784e45543c18c774c049bff6d3dbaf045c9c74"
@@ -4931,7 +4936,7 @@ sc-base-apis@3.0.1-beta.0:
     sc-api-client "1.5.0"
     sc-common "3.0.0"
 
-sc-common@3.0.0:
+sc-common@3.0.0, sc-common@^3.0.0:
   version "3.0.0"
   resolved "https://npm.lumigame.com/sc-common/-/sc-common-3.0.0.tgz#5004c8aa96a56f43dd4df0d6906a23bd995ea665"
   integrity sha512-tbvQYLRDqMreuQIcdGq/UwoOt+9rxwqDVmgcHHVOqx8rRqq/0KI8CrH2WagKEiKu/0HH8b107VkDRPgiYmNTnA==

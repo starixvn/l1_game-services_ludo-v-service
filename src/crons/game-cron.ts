@@ -4,7 +4,7 @@ import {
   RoundResultConsumer,
   SettleGameRoundConsumer,
 } from "../event-consumers/index.js";
-import { GameStatusPublisher } from "../event-publishers/index.js";
+import { RunningRoundInfoPublisher } from "../event-publishers/index.js";
 import GameData from "../game-data.js";
 import GameDefinition from "../game-definition.js";
 
@@ -15,7 +15,7 @@ export class GameCron extends Table.Crons.TableGameCron {
   declare settleGameRoundConsumer: SettleGameRoundConsumer;
   declare gameData: GameData;
   declare roundResultConsumer: RoundResultConsumer;
-  declare gameStatusPublisher: GameStatusPublisher;
+  declare runningRoundInfoPublisher: RunningRoundInfoPublisher;
   constructor({
     definition,
     gameData,
@@ -89,7 +89,7 @@ export class GameCron extends Table.Crons.TableGameCron {
     if (this.isStartingTime(remainingTime, durations)) {
       this.resetForNewRound();
       await this.calculateOdds();
-      await this.gameStatusPublisher.publishInfoForNewRound();
+      await this.runningRoundInfoPublisher.publishInfoForNewRound();
       this.bot && this.bot.reset();
     }
 

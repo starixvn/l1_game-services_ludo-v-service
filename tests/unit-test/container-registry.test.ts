@@ -51,11 +51,12 @@ jest.mock("../../src/event-consumers/index.js", () => ({
   RoundConsumer: jest.fn(),
   RoundResultConsumer: jest.fn(),
   SettleGameRoundConsumer: jest.fn(),
+  PlaceBetConsumer: jest.fn(),
 }));
 
 // Mock event publishers
 jest.mock("../../src/event-publishers/index.js", () => ({
-  GameStatusPublisher: jest.fn(),
+  RunningRoundInfoPublisher: jest.fn(),
 }));
 
 // Mock crons

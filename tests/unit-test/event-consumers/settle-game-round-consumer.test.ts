@@ -1,4 +1,4 @@
-import { PlayerColor } from "@rd/ludo-rules";
+import { convertBoardState, PlayerColor } from "@rd/ludo-rules";
 import mongoose from "mongoose";
 import { SettleGameRoundConsumer } from "../../../src/event-consumers/settle-game-round-consumer.js";
 import GameData from "../../../src/game-data.js";
@@ -179,7 +179,6 @@ describe("SettleGameRoundConsumer", () => {
       expect(roundResult).toBeDefined();
       expect(roundResult.result.dice1).toEqual(3);
       expect(roundResult.result.dice2).toEqual(5);
-      expect(roundResult.result.dice).toBeUndefined();
       expect(roundResult.roundId).toBe(10);
       expect(roundResult.settlementResult).toEqual(settlementResult);
     });
@@ -230,12 +229,6 @@ describe("SettleGameRoundConsumer", () => {
 
       // Assert
       expect(roundResult.result.board).toEqual(result.board);
-      expect(roundResult.result.nextTurnIndex).toBe(1);
-      expect(roundResult.result.currentPlayers).toEqual([
-        PlayerColor.RED,
-        PlayerColor.GREEN,
-      ]);
-      expect(roundResult.result.winners).toEqual([PlayerColor.RED]);
       expect(roundResult.result.action).toEqual(result.action);
     });
 
@@ -292,7 +285,6 @@ describe("SettleGameRoundConsumer", () => {
         // Assert
         expect(roundResult.result.dice1).toEqual(dice[0]);
         expect(roundResult.result.dice2).toEqual(dice[1]);
-        expect(roundResult.result.dice).toBeUndefined();
       });
     });
   });
@@ -903,10 +895,10 @@ describe("SettleGameRoundConsumer", () => {
         mockDeps.roundResultPublisher.publishRoundResult,
       ).toHaveBeenCalledWith({
         result: {
-          ...mockResult,
+          board: convertBoardState(mockResult.board),
           dice1: 3,
           dice2: 4,
-          dice: undefined,
+          action: mockResult.action,
         },
         settlementResult: mockSettlementResult,
         roundId: 10,

@@ -157,7 +157,6 @@ describe("InGameConsumer", () => {
       expect(roundData).toBeDefined();
       expect(roundData.board).toEqual(mockBoardState);
       expect(roundData.currentTurnCount).toBe(4); // roundId (5) - initRoundId (1) = 4
-      expect(roundData.action).toEqual(mockGameData.result.action);
     });
 
     test("should include next player color based on turn index", async () => {
@@ -165,7 +164,7 @@ describe("InGameConsumer", () => {
       const roundData = await consumer.generateGameState();
 
       // Assert
-      expect(roundData.nextPlayerColor).toBe(PlayerColor.RED);
+      expect(roundData.nextPlayer).toBe(PlayerColor.RED);
     });
 
     test("should include possible actions from bot calculation", async () => {
@@ -189,7 +188,7 @@ describe("InGameConsumer", () => {
       const roundData = await consumer.generateGameState();
 
       // Assert
-      expect(roundData.nextPlayerColor).toBe(PlayerColor.YELLOW);
+      expect(roundData.nextPlayer).toBe(PlayerColor.YELLOW);
     });
   });
 

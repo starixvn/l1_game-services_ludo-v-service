@@ -94,14 +94,13 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
   }
 
   async generateGameState() {
-    const nextPlayerColor =
+    const nextPlayer =
       this.gameData.result.currentPlayers[this.gameData.result.nextTurnIndex];
     const possibleActions = await getPossibleActions(this.gameData);
     return {
       board: convertBoardState(this.gameData.result.board),
       currentTurnCount: this.gameData.roundId - this.gameData.initRoundId,
-      action: this.gameData.result.action,
-      nextPlayerColor,
+      nextPlayer,
       possibleActions,
     };
   }

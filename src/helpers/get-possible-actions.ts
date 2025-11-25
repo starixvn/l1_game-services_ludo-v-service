@@ -11,13 +11,15 @@ export const getPossibleActions = async (gameData: GameData) => {
     nextPlayerColor,
   );
 
-  return Object.keys(possibleActionSet).map((key) => {
-    const [oldPosition, newPosition] = key.split("-");
-    return {
-      oldPosition: getWorldPosition(parseInt(oldPosition), nextPlayerColor),
-      newPosition: getWorldPosition(parseInt(newPosition), nextPlayerColor),
-    };
-  });
+  return Object.keys(possibleActionSet)
+    .map((key) => {
+      const [oldPosition, newPosition] = key.split("-");
+      return {
+        oldPosition: getWorldPosition(parseInt(oldPosition), nextPlayerColor),
+        newPosition: getWorldPosition(parseInt(newPosition), nextPlayerColor),
+      };
+    })
+    .filter((action) => action.oldPosition !== action.newPosition);
 };
 
 const getWorldPosition = (position: number, playerColor: PlayerColor) => {

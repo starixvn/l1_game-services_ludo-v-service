@@ -50,11 +50,16 @@ jest.mock("sc-game-base", () => {
       this.generateResult = jest.fn();
     }
   };
+  const mockPlaceBetConsumer = class MockPlaceBetConsumer {
+    constructor() {}
+    placeBet = jest.fn();
+  };
 
   return {
     Core: {
       BaseEventConsumers: {
         RoundResultConsumer: mockRoundResultConsumer,
+        PlaceBetConsumer: mockPlaceBetConsumer,
       },
     },
     Table: {

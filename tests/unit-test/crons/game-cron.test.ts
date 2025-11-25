@@ -966,11 +966,11 @@ function createMockDependencies() {
   const mockGameStatusPublisher = {
     publishStartPlacingBetStatus: jest.fn(),
     publishEndPlacingBetStatus: jest.fn(),
-    publishInfoForNewRound: jest.fn().mockResolvedValue(undefined),
   };
 
   const mockRunningRoundInfoPublisher = {
     publish: jest.fn(),
+    publishInfoForNewRound: jest.fn().mockResolvedValue(undefined),
   };
 
   const mockLogService = {};
