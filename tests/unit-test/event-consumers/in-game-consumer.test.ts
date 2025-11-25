@@ -42,6 +42,13 @@ jest.mock("../../../src/helpers/rule-bot-instance.js", () => ({
   },
 }));
 
+const mockBoardState = {
+  0: [0, 0, 0, 0],
+  1: [0, 0, 0, 0],
+  2: [0, 0, 0, 0],
+  3: [0, 0, 0, 0],
+};
+
 jest.mock("@rd/ludo-rules", () => ({
   PlayerColor: {
     RED: "red",
@@ -52,6 +59,12 @@ jest.mock("@rd/ludo-rules", () => ({
   getAllActionByBot: jest.fn().mockResolvedValue({
     "0-1": { oldPosition: 0, newPosition: 1 },
     "5-10": { oldPosition: 5, newPosition: 10 },
+  }),
+  convertBoardState: jest.fn().mockReturnValue({
+    0: [0, 0, 0, 0],
+    1: [0, 0, 0, 0],
+    2: [0, 0, 0, 0],
+    3: [0, 0, 0, 0],
   }),
 }));
 
@@ -142,7 +155,7 @@ describe("InGameConsumer", () => {
 
       // Assert
       expect(roundData).toBeDefined();
-      expect(roundData.board).toEqual(mockGameData.result.board);
+      expect(roundData.board).toEqual(mockBoardState);
       expect(roundData.currentTurnCount).toBe(4); // roundId (5) - initRoundId (1) = 4
       expect(roundData.action).toEqual(mockGameData.result.action);
     });
