@@ -1,4 +1,4 @@
-import { getAllActionByBot } from "@rd/ludo-rules";
+import { convertBoardState, getAllActionByBot } from "@rd/ludo-rules";
 import { Table } from "sc-game-base";
 import { Systems } from "sc-game-base/dist/constants/systems.js";
 import GameData from "../game-data.js";
@@ -109,7 +109,7 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
       };
     });
     return {
-      board: this.gameData.result.board,
+      board: convertBoardState(this.gameData.result.board),
       currentTurnCount: this.gameData.roundId - this.gameData.initRoundId,
       action: this.gameData.result.action,
       nextPlayerColor,

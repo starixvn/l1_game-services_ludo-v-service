@@ -1,3 +1,4 @@
+import { convertBoardState } from "@rd/ludo-rules";
 import { Table } from "sc-game-base";
 import GameData from "../game-data.js";
 import { IBet } from "../models/interfaces/bet.js";
@@ -58,6 +59,7 @@ export class SettleGameRoundConsumer extends Table.EventConsumers
     return {
       result: {
         ...result,
+        board: convertBoardState(result.board),
         dice1: result.dice[0],
         dice2: result.dice[1],
         dice: undefined,
