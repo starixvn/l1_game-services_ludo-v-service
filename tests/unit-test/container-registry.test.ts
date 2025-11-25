@@ -1,14 +1,14 @@
-import { asClass, asValue, AwilixContainer, createContainer } from "awilix";
+import { asValue, AwilixContainer, createContainer } from "awilix";
 import ContainerRegistry from "../../src/container-registry.js";
-import { BetLogs, Bets, Rounds, TempBets } from "../../src/models/index.js";
+import { GameCron } from "../../src/crons/game-cron.js";
+import { ProcessBetQueue } from "../../src/crons/process-bet-queue.js";
 import {
   InGameConsumer,
   RoundConsumer,
   RoundResultConsumer,
   SettleGameRoundConsumer,
 } from "../../src/event-consumers/index.js";
-import { GameCron } from "../../src/crons/game-cron.js";
-import { ProcessBetQueue } from "../../src/crons/process-bet-queue.js";
+import { BetLogs, Bets, Rounds, TempBets } from "../../src/models/index.js";
 
 // Mock sc-game-base
 jest.mock("sc-game-base", () => {
@@ -51,6 +51,11 @@ jest.mock("../../src/event-consumers/index.js", () => ({
   RoundConsumer: jest.fn(),
   RoundResultConsumer: jest.fn(),
   SettleGameRoundConsumer: jest.fn(),
+}));
+
+// Mock event publishers
+jest.mock("../../src/event-publishers/index.js", () => ({
+  GameStatusPublisher: jest.fn(),
 }));
 
 // Mock crons
@@ -512,9 +517,7 @@ describe("ContainerRegistry", () => {
       registry.registerConsumers();
 
       // Assert - Should not throw errors
-      expect(() =>
-        registry.container.resolve("inGameConsumer"),
-      ).not.toThrow();
+      expect(() => registry.container.resolve("inGameConsumer")).not.toThrow();
       expect(() => registry.container.resolve("roundConsumer")).not.toThrow();
       expect(() =>
         registry.container.resolve("roundResultConsumer"),
@@ -533,9 +536,7 @@ describe("ContainerRegistry", () => {
 
       // Assert - Should not throw errors
       expect(() => registry.container.resolve("gameCron")).not.toThrow();
-      expect(() =>
-        registry.container.resolve("processBetQueue"),
-      ).not.toThrow();
+      expect(() => registry.container.resolve("processBetQueue")).not.toThrow();
     });
 
     test("should support multiple registry instances independently", () => {

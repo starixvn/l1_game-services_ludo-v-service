@@ -8,6 +8,7 @@ import {
   RoundResultConsumer,
   SettleGameRoundConsumer,
 } from "./event-consumers/index.js";
+import { GameStatusPublisher } from "./event-publishers/index.js";
 import { BetLogs, Bets, Rounds, TempBets } from "./models/index.js";
 
 export default class ContainerRegistry extends Table.TableContainerRegistry {
@@ -41,6 +42,14 @@ export default class ContainerRegistry extends Table.TableContainerRegistry {
     this.container.register({
       gameCron: asClass(GameCron).singleton().proxy(),
       processBetQueue: asClass(ProcessBetQueue).singleton().proxy(),
+    });
+  }
+
+  registerPublishers(): void {
+    super.registerPublishers();
+
+    this.container.register({
+      gameStatusPublisher: asClass(GameStatusPublisher).singleton(),
     });
   }
 }

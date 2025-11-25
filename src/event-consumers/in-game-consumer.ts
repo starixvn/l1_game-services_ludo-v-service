@@ -1,9 +1,9 @@
-import { convertBoardState, getAllActionByBot } from "@rd/ludo-rules";
+import { convertBoardState } from "@rd/ludo-rules";
 import { Table } from "sc-game-base";
 import { Systems } from "sc-game-base/dist/constants/systems.js";
 import GameData from "../game-data.js";
 import GameDefinition from "../game-definition.js";
-import { ruleBotInstance } from "../helpers/rule-bot-instance.js";
+import { getPossibleActions } from "../helpers/index.js";
 import { RoundQuery } from "../query-apis/round-query.js";
 import { RealPlayer } from "../types.js";
 
@@ -96,18 +96,7 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
   async generateGameState() {
     const nextPlayerColor =
       this.gameData.result.currentPlayers[this.gameData.result.nextTurnIndex];
-    const possibleActionSet = await getAllActionByBot(
-      ruleBotInstance,
-      this.gameData.result.board,
-      nextPlayerColor,
-    );
-    const possibleActions = Object.keys(possibleActionSet).map((key) => {
-      const [oldPosition, newPosition] = key.split("-");
-      return {
-        oldPosition: parseInt(oldPosition),
-        newPosition: parseInt(newPosition),
-      };
-    });
+    const possibleActions = await getPossibleActions(this.gameData);
     return {
       board: convertBoardState(this.gameData.result.board),
       currentTurnCount: this.gameData.roundId - this.gameData.initRoundId,
