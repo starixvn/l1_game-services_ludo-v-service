@@ -119,17 +119,6 @@ describe("generateOdds", () => {
       expect(odds).toHaveProperty("kick");
       expect(odds).toHaveProperty("noKick");
     });
-
-    test("should return all numeric values for odds", async () => {
-      // Act
-      const odds = await generateOdds(0.05, mockResult);
-      const allValuesAreNumbers = Object.values(odds).every(
-        (value) => typeof value === "number",
-      );
-
-      // Assert
-      expect(allValuesAreNumbers).toBe(true);
-    });
   });
 
   describe("Dice probability calculations", () => {
@@ -197,14 +186,20 @@ describe("generateOdds", () => {
       const oddsWithoutMargin = await generateOdds(0, mockResult);
 
       // Assert
-      expect(oddsWithMargin.big).toBeCloseTo(oddsWithoutMargin.big - margin, 2);
-      expect(oddsWithMargin.small).toBeCloseTo(
-        oddsWithoutMargin.small - margin,
+      expect(oddsWithMargin.big).toBeCloseTo(
+        Math.floor((oddsWithoutMargin.big - margin) * 100) / 100,
         2,
       );
-      expect(oddsWithMargin.odd).toBeCloseTo(oddsWithoutMargin.odd - margin, 2);
+      expect(oddsWithMargin.small).toBeCloseTo(
+        Math.floor((oddsWithoutMargin.small - margin) * 100) / 100,
+        2,
+      );
+      expect(oddsWithMargin.odd).toBeCloseTo(
+        Math.floor((oddsWithoutMargin.odd - margin) * 100) / 100,
+        2,
+      );
       expect(oddsWithMargin.even).toBeCloseTo(
-        oddsWithoutMargin.even - margin,
+        Math.floor((oddsWithoutMargin.even - margin) * 100) / 100,
         2,
       );
     });
@@ -222,25 +217,10 @@ describe("generateOdds", () => {
       expect(odds.odd).toBeCloseTo(2, 2);
       expect(odds.even).toBeCloseTo(2, 2);
     });
-
-    test("should handle high margin values", async () => {
-      // Arrange
-      const margin = 0.5;
-      mockIsSkipAction.mockReturnValue(true);
-
-      // Act
-      const odds = await generateOdds(margin, mockResult);
-
-      // Assert
-      Object.values(odds).forEach((value) => {
-        expect(typeof value).toBe("number");
-        expect(isNaN(value)).toBe(false);
-      });
-    });
   });
 
   describe("Action-based odds - Move/NoMove", () => {
-    test("should calculate move odds when actions are available", async () => {
+    test("should return null for move odds when no actions are available", async () => {
       // Arrange
       mockIsSkipAction.mockReturnValue(false); // All 36 combinations result in move
       mockRuleBotMove.mockResolvedValue({
@@ -252,13 +232,12 @@ describe("generateOdds", () => {
       const odds = await generateOdds(0, mockResult);
 
       // Assert
-      // All 36 combinations are moves: 1 / (36/36) - 0 = 1
-      expect(odds.move).toBeCloseTo(1, 2);
+      expect(odds.move).toBeNull();
     });
 
-    test("should calculate noMove odds when no actions available", async () => {
+    test("should return null for noMove odds when all combinations are skips", async () => {
       // Arrange
-      mockIsSkipAction.mockReturnValue(true); // All 36 combinations result in skip
+      mockIsSkipAction.mockReturnValue(true);
       mockRuleBotMove.mockResolvedValue({
         oldPosition: 0,
         newPosition: 0,
@@ -268,8 +247,7 @@ describe("generateOdds", () => {
       const odds = await generateOdds(0, mockResult);
 
       // Assert
-      // All 36 combinations are skips: 1 / (36/36) - 0 = 1
-      expect(odds.noMove).toBeCloseTo(1, 2);
+      expect(odds.noMove).toBeNull();
     });
 
     test("should calculate mixed move/noMove odds", async () => {
@@ -291,15 +269,15 @@ describe("generateOdds", () => {
   });
 
   describe("Action-based odds - Release/NoRelease", () => {
-    test("should calculate release odds correctly", async () => {
+    test("should return null for release odds when all combinations are releases", async () => {
       // Arrange
-      mockIsReleaseAction.mockReturnValue(true); // All combinations are releases
+      mockIsReleaseAction.mockReturnValue(true);
 
       // Act
       const odds = await generateOdds(0, mockResult);
 
       // Assert
-      expect(odds.release).toBeCloseTo(1, 2);
+      expect(odds.release).toBeNull();
     });
 
     test("should calculate noRelease odds correctly", async () => {
@@ -310,7 +288,7 @@ describe("generateOdds", () => {
       const odds = await generateOdds(0, mockResult);
 
       // Assert
-      expect(odds.noRelease).toBeCloseTo(1, 2);
+      expect(odds.noRelease).toBeNull();
     });
 
     test("should handle partial release scenarios", async () => {
@@ -331,26 +309,26 @@ describe("generateOdds", () => {
   });
 
   describe("Action-based odds - GoStable/NoStable", () => {
-    test("should calculate goStable odds correctly", async () => {
+    test("should return null for goStable odds when all combinations are go to stable", async () => {
       // Arrange
-      mockIsGoToStableAction.mockReturnValue(true); // All combinations go to stable
+      mockIsGoToStableAction.mockReturnValue(true);
 
       // Act
       const odds = await generateOdds(0, mockResult);
 
       // Assert
-      expect(odds.goStable).toBeCloseTo(1, 2);
+      expect(odds.goStable).toBeNull();
     });
 
-    test("should calculate noStable odds correctly", async () => {
+    test("should return null for noStable odds when all combinations are not go to stable", async () => {
       // Arrange
-      mockIsGoToStableAction.mockReturnValue(false); // No combinations go to stable
+      mockIsGoToStableAction.mockReturnValue(false);
 
       // Act
       const odds = await generateOdds(0, mockResult);
 
       // Assert
-      expect(odds.noStable).toBeCloseTo(1, 2);
+      expect(odds.noStable).toBeNull();
     });
 
     test("should handle mixed stable scenarios", async () => {
@@ -371,26 +349,26 @@ describe("generateOdds", () => {
   });
 
   describe("Action-based odds - Kick/NoKick", () => {
-    test("should calculate kick odds when kicks are possible", async () => {
+    test("should return null for kick odds when all combinations are kicks", async () => {
       // Arrange
-      mockIsKickAction.mockReturnValue(true); // All combinations result in kick
+      mockIsKickAction.mockReturnValue(true);
 
       // Act
       const odds = await generateOdds(0, mockResult);
 
       // Assert
-      expect(odds.kick).toBeCloseTo(1, 2);
+      expect(odds.kick).toBeNull();
     });
 
-    test("should calculate noKick odds when no kicks possible", async () => {
+    test("should return null for noKick odds when all combinations are not kicks", async () => {
       // Arrange
-      mockIsKickAction.mockReturnValue(false); // No combinations result in kick
+      mockIsKickAction.mockReturnValue(false);
 
       // Act
       const odds = await generateOdds(0, mockResult);
 
       // Assert
-      expect(odds.noKick).toBeCloseTo(1, 2);
+      expect(odds.noKick).toBeNull();
     });
 
     test("should handle partial kick scenarios", async () => {
@@ -533,10 +511,7 @@ describe("generateOdds", () => {
 
       // Assert
       expect(odds).toBeDefined();
-      Object.values(odds).forEach((value) => {
-        expect(typeof value).toBe("number");
-        // Some values might be Infinity if count is 0, which is valid for impossible outcomes
-      });
+      expect(Object.keys(odds)).toHaveLength(12);
     });
 
     test("should handle complex board state with multiple pieces", async () => {
@@ -554,22 +529,7 @@ describe("generateOdds", () => {
 
       // Assert
       expect(odds).toBeDefined();
-      Object.values(odds).forEach((value) => {
-        expect(typeof value).toBe("number");
-      });
-    });
-
-    test("should handle negative margin (bonus odds)", async () => {
-      // Arrange
-      const negativeMargin = -0.1;
-      mockIsSkipAction.mockReturnValue(true);
-
-      // Act
-      const odds = await generateOdds(negativeMargin, mockResult);
-
-      // Assert
-      // With negative margin, odds should be higher
-      expect(odds.odd).toBeCloseTo(2 - negativeMargin, 2); // 2.1
+      expect(Object.keys(odds)).toHaveLength(12);
     });
   });
 

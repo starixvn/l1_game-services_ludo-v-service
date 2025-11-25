@@ -88,6 +88,9 @@ export class GameCron extends Table.Crons.TableGameCron {
     if (this.isStartingTime(remainingTime, durations)) {
       this.resetForNewRound();
       await this.calculateOdds();
+      this.gameStatusPublisher.publishToAllUsers({
+        odds: this.gameData.odds,
+      });
       this.bot && this.bot.reset();
     }
 

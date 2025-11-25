@@ -966,6 +966,7 @@ function createMockDependencies() {
   const mockGameStatusPublisher = {
     publishStartPlacingBetStatus: jest.fn(),
     publishEndPlacingBetStatus: jest.fn(),
+    publishToAllUsers: jest.fn(),
   };
 
   const mockRunningRoundInfoPublisher = {

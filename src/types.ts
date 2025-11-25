@@ -1,16 +1,17 @@
+export type OddsValue = number;
 export type Odds = {
-  big: number;
-  small: number;
-  odd: number;
-  even: number;
-  kick: number;
-  noKick: number;
-  move: number;
-  noMove: number;
-  release: number;
-  noRelease: number;
-  goStable: number;
-  noStable: number;
+  big: OddsValue;
+  small: OddsValue;
+  odd: OddsValue;
+  even: OddsValue;
+  kick: OddsValue;
+  noKick: OddsValue;
+  move: OddsValue;
+  noMove: OddsValue;
+  release: OddsValue;
+  noRelease: OddsValue;
+  goStable: OddsValue;
+  noStable: OddsValue;
 };
 
 export type RealPlayer = {
