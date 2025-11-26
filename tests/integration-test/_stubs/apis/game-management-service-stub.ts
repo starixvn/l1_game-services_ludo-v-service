@@ -351,7 +351,11 @@ export const stubUserServiceWithMockData = () => {
 
     nock(appConfigs.userServiceSettings.url)
       .persist()
-      .post("/gameBackend/signInGame", matches(params), () => true)
+      .post(
+        "/gameBackend/signInGame",
+        matches(params as any) as any,
+        (() => true) as any,
+      )
       .reply(200, { ...userSession, id: userSession.userId });
   });
 };

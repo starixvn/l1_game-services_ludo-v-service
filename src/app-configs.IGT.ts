@@ -1,5 +1,5 @@
 export default {
-  hostingPort: 5001,
+  hostingPort: 5002,
   id: 163,
   name: "ludo",
   apiSettings: {

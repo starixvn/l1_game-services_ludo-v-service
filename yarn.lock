@@ -2426,6 +2426,11 @@
   resolved "https://npm.lumigame.com/@types/sc-common/-/sc-common-1.0.2.tgz#6859c5f010b9e0bbd3ea05980187956173902fca"
   integrity sha512-SJr/wgiGyNnzNhfxBd1ppDWZV5s/O9SHuKSSxWTxk4MzV7JX4jvyN/6opDpYdmnWwJP4aOhFEttaGWErD2V8Ew==
 
+"@types/sc-game-service-integration-utils@^1.0.0":
+  version "1.0.0"
+  resolved "https://npm.lumigame.com/@types/sc-game-service-integration-utils/-/sc-game-service-integration-utils-1.0.0.tgz#79f6fc76bc40fd48cfb71922eb69f2e55f9f129c"
+  integrity sha512-S78BHmGvapTCM9LKmMCnzG5YUvjbL1sMlWQLVKW8vQoo93X3f2Wqs8nguZfc0SAehArzCTpI4fGlCEiPxpS9AA==
+
 "@types/send@*":
   version "1.2.1"
   resolved "https://npm.lumigame.com/@types/send/-/send-1.2.1.tgz#6a784e45543c18c774c049bff6d3dbaf045c9c74"
