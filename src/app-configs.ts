@@ -38,4 +38,9 @@ export default {
     logIdentifier: "LudoV",
     env: "LOCAL",
   },
+  gameResultSettings: {
+    baseUrl: "http://localhost:3000/game-result",
+    id: "Game Service",
+    key: "8888",
+  },
 };
