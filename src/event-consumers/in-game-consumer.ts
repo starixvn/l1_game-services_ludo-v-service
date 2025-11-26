@@ -33,7 +33,6 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
     const gameConfigs = {
       ...settings,
       margin,
-      odds: this.gameData.odds,
     };
     const { ownBets } = this.gameData.ingame[realPlayer.profile.name] || {
       ownBets: {},
@@ -55,6 +54,7 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
       gameConfigs,
       roundHistory,
       ownBets,
+      odds: this.gameData.odds,
       gameState: await this.generateGameState(),
       totalBets,
       user: { ...user, rate },
