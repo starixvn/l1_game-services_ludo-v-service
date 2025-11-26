@@ -1,8 +1,8 @@
-import { Schema } from "mongoose";
+import mongoose from "mongoose";
 import { IMatch } from "../interfaces/match.js";
 import { resultSchema } from "./result-schema.js";
 
-export const matchSchema = new Schema<IMatch>({
+export const matchSchema = new mongoose.Schema<IMatch>({
   id: { type: Number, required: true },
   turns: { type: [resultSchema], required: true },
   startTime: { type: Date, required: true },

@@ -1,7 +1,7 @@
-import { Schema } from "mongoose";
+import mongoose from "mongoose";
 import { IResult } from "../interfaces/result.js";
 
-const actionSchema = new Schema(
+const actionSchema = new mongoose.Schema(
   {
     oldPosition: { type: Number, required: true },
     newPosition: { type: Number, required: true },
@@ -10,7 +10,7 @@ const actionSchema = new Schema(
   { _id: false },
 );
 
-export const resultSchema = new Schema<IResult>(
+export const resultSchema = new mongoose.Schema<IResult>(
   {
     board: { type: Object, required: true },
     nextTurnIndex: { type: Number, required: true },

@@ -1,7 +1,7 @@
-import { Schema } from "mongoose";
+import mongoose from "mongoose";
 import { ISettlementResult } from "../interfaces/settlement-result.js";
 
-export const settlementResultSchema = new Schema<ISettlementResult>(
+export const settlementResultSchema = new mongoose.Schema<ISettlementResult>(
   {
     odd: { type: Boolean },
     even: { type: Boolean },

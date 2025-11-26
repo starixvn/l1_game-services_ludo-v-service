@@ -1,9 +1,9 @@
-import { Schema } from "mongoose";
+import mongoose from "mongoose";
 import { IRound } from "../interfaces/round.js";
 import { resultSchema } from "./result-schema.js";
 import { settlementResultSchema } from "./settlement-result-schema.js";
 
-export const roundSchema = new Schema<IRound>({
+export const roundSchema = new mongoose.Schema<IRound>({
   id: { type: Number, required: true },
   result: { type: resultSchema, required: true },
   settlementResult: { type: settlementResultSchema, required: true },
