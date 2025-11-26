@@ -4,8 +4,8 @@ export default {
   id: 163,
   durations: {
     wholeRound: 32,
-    placingBets: 31,
-    lockingBet: 14,
+    placingBets: 17,
+    lockingBet: 3,
   },
   name: "ludo",
   choices: ODDS_KEYS,
