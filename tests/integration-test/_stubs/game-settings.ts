@@ -1,35 +1,10 @@
+import gameSettings from "../../../src/game-settings.js";
+
 export default {
-  id: 163,
-  name: "Ludo",
+  ...gameSettings,
   durations: {
-    wholeRound: 15,
-    placingBets: 14,
+    wholeRound: 18,
+    placingBets: 17,
     lockingBet: 3,
   },
-  choices: [
-    "big",
-    "small",
-    "odd",
-    "even",
-    "kick",
-    "noKick",
-    "move",
-    "noMove",
-    "release",
-    "noRelease",
-    "goStable",
-    "noStable",
-  ],
-  choicesMapper: {},
-  hedgeBetGroups: [
-    ["big", "small"],
-    ["odd", "even"],
-    ["kick", "noKick"],
-    ["move", "noMove"],
-    ["release", "noRelease"],
-    ["goStable", "noStable"],
-  ],
-  numberOfRoundHistory: 10,
-  historyPageSize: 10,
-  provablyFair: true,
 };

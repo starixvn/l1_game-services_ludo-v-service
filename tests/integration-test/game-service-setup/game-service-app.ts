@@ -1,53 +1,18 @@
 import { Core } from "sc-game-base";
-import {
-  initAPIStub,
-  stubUserService,
-  subGameManagementService,
-} from "sc-game-service-integration-utils";
 
-import {
-  endGameErrorUser,
-  errorUser,
-  internalServerErrorUser,
-  normalUser,
-} from "sc-game-service-integration-utils/src/stubs/user-stub";
 import appConfigs from "../../../src/app-configs.IGT.js";
 import ContainerRegistry from "../../../src/container-registry.js";
 import GameData from "../../../src/game-data.js";
 import GameDefinition from "../../../src/game-definition.js";
-import gameSettings from "../../../src/game-settings.js";
 import {
   generateOdds,
   generateResult,
   generateSettlementResult,
 } from "../../../src/helpers/index.js";
-import { stubUserInfo } from "../_stubs/apis/game-management.js";
-import {
-  stubDomain,
-  stubGameNotifications,
-  stubPromotionService,
-  stubUserTrackingApi,
-} from "../_stubs/apis/index.js";
+import { initAllStubsWithMockData } from "../_stubs/apis/game-management-service-stub.js";
+import gameSettings from "../_stubs/game-settings.js";
 
 export const run = async () => {
-  initAPIStub(appConfigs.apiSettings.apiUrl);
-  stubUserService(appConfigs, [
-    endGameErrorUser,
-    errorUser,
-    internalServerErrorUser,
-    normalUser,
-  ] as any);
-  stubGameNotifications();
-  stubUserTrackingApi();
-  stubDomain();
-  stubPromotionService(120);
-  const userInfos = [
-    endGameErrorUser,
-    errorUser,
-    internalServerErrorUser,
-    normalUser,
-  ] as any;
-  userInfos.map((userInfo) => stubUserInfo(userInfo, appConfigs));
   const definition = new GameDefinition(
     gameSettings,
     generateResult,
@@ -55,7 +20,9 @@ export const run = async () => {
     undefined,
     generateOdds,
   );
-  subGameManagementService(appConfigs, definition);
+
+  // Initialize all stubs with mock data - no database required
+  initAllStubsWithMockData(definition);
 
   const gameData = new GameData(gameSettings.durations.wholeRound);
   const container = new ContainerRegistry().register(

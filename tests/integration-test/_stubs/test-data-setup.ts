@@ -1,28 +1,16 @@
 import mongoose from "mongoose";
-import { users } from "sc-base-database";
 import { middlewares } from "sc-common";
-import {
-  createCurrencyGroupGames,
-  createDummyCurrency,
-  createDummyUsers,
-  createExchangeRate,
-  createPartnerConfig,
-  normalUser,
-} from "sc-game-service-integration-utils";
 
 import appConfigs from "../../../src/app-configs.IGT.js";
-import { Rounds } from "../../../src/models/index.js";
+import { BetLogs, Bets, Rounds } from "../../../src/models/index.js";
 import {
-  createGameConfig,
+  createBetData,
+  createBetLogData,
   createRoundData,
-  currencyData,
-  game,
-  gameConfig,
-} from "./test-data";
+} from "./test-data.js";
 
 const connectDatabase = async () => {
   await middlewares.database.configureDatabase(mongoose, appConfigs.database);
-
   await clearAllData();
 };
 
@@ -36,38 +24,21 @@ const clearAllData = async () => {
 
 export const createTestData = async () => {
   await connectDatabase();
-  await createExchangeRate();
-  await createGameConfig();
-  const partnerConfig = await createPartnerConfig(game.id);
 
-  const currency = await createDummyCurrency(
-    partnerConfig.partnerId,
-    currencyData.code,
-    currencyData.name,
-  );
-  await createCurrencyGroupGames(currency.groupId, game.id, gameConfig);
-  await createDummyUsers(currency);
+  // Only seed rounds data for history tests
+  // All other data (game configs, users, currencies, etc.) are mocked via nock
   await createGameData();
 
-  console.log(
-    "Create exchange rate, game config & dummy user for testing successfully!",
-  );
+  console.log("Created round data for testing successfully!");
   process.exit(0);
 };
 
-const getUserId = async (playerId) => {
-  const user = await users
-    .findOne({ "local.playerId": playerId }, { _id: true })
-    .lean();
-  return user?._id?.toString();
-};
-
 const createGameData = async () => {
-  const uid = await getUserId(normalUser.playerId);
-  if (!uid) {
-    return;
-  }
+  // Use a static user ID since we're mocking user service
+  const uid = "user-1"; // Matches the mock user ID in game-management-service-stub.ts
   await Rounds.insertMany(createRoundData(uid));
+  await Bets.insertMany(createBetData(uid));
+  await BetLogs.insertMany(createBetLogData(uid));
 };
 
 createTestData();

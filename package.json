@@ -8,7 +8,7 @@
     "reg": "npm set registry http://npm.lumigame.com",
     "test": "jest --testPathPatterns=tests/unit-test/",
     "test-coverage": "jest --collect-coverage --testPathPatterns=tests/unit-test/",
-    "test-integration": "jest --config=jest.integration.config.cjs",
+    "test-integration": "jest --config=jest.integration.config.cjs --testPathPatterns=tests/integration-test/ludo.test.ts",
     "start": "node --max-old-space-size=8192 --import=extensionless/register ./dist/app.js"
   },
   "keywords": [],

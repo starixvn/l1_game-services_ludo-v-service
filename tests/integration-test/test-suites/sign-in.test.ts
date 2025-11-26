@@ -16,15 +16,9 @@ describe("signin", () => {
       initUserSession(normalUser),
     );
 
-    const sendSignInInterval = setInterval(() => {
-      client.sendSignInEvent();
-    }, 500);
-
     // Act
     await client.handleSignedInEvent();
 
-    clearInterval(sendSignInInterval);
-
-    client.close();
+    await client.close();
   });
 });

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
+import gameSetting from "../../../src/game-settings.js";
 import { GameConfigSchema } from "../models/game-config";
-import gameSetting from "./game-settings";
 
 export const game = {
   id: gameSetting.id,
@@ -62,24 +62,26 @@ export const createGameConfig = async () => {
   );
 };
 
+// Full odds used in round data (matching what tests expect)
+const roundOdds = {
+  big: 1.95,
+  small: 1.95,
+  odd: 1.95,
+  even: 1.95,
+  kick: 3.5,
+  noKick: 1.25,
+  move: 1.95,
+  noMove: 1.95,
+  release: 3.5,
+  noRelease: 1.25,
+  goStable: 3.5,
+  noStable: 1.25,
+};
+
 export const createRoundData = (uid) => {
   return [
     {
       id: 2,
-      uid: "otheruser",
-      name: "OtherUser",
-      amount: 100,
-      totalAmount: 100,
-      betWin: 195,
-      reachMaxWin: false,
-      odds: gameConfig.odds,
-      currency: "$US",
-      rate: 1,
-      siteId: "111",
-      playerId: 2,
-      operatorId: "dummy-operator-id",
-      paid: true,
-      appType: 1,
       time: new Date(),
       result: {
         board: {
@@ -112,20 +114,6 @@ export const createRoundData = (uid) => {
     },
     {
       id: 1,
-      uid: uid,
-      name: "NormalUser",
-      amount: 100,
-      totalAmount: 100,
-      betWin: 195,
-      reachMaxWin: false,
-      odds: gameConfig.odds,
-      currency: "$US",
-      rate: 1,
-      siteId: "111",
-      playerId: 1,
-      operatorId: "dummy-operator-id",
-      paid: true,
-      appType: 1,
       time: new Date(),
       result: {
         board: {
@@ -155,6 +143,46 @@ export const createRoundData = (uid) => {
         goStable: false,
       },
       exchangeRateId: 2089,
+    },
+  ];
+};
+
+export const createBetData = (uid: string) => {
+  return [
+    {
+      roundId: 1,
+      uid: uid,
+      __v: 0,
+      currency: "INH",
+      freeBet: false,
+      kick: 10,
+      margin: 0.05,
+      maxWin: 0,
+      name: "Test User",
+      odds: roundOdds,
+      operatorId: "1234",
+      paid: true,
+      playerId: "1234567890",
+      rate: 1,
+      reachMaxWin: false,
+      siteId: "4433",
+      time: new Date(),
+      totalAmount: 10,
+      betwin: 10,
+    },
+  ];
+};
+
+export const createBetLogData = (uid: string) => {
+  return [
+    {
+      uid: uid,
+      name: "Test User",
+      time: new Date(),
+      choice: "noKick",
+      amount: 10,
+      roundId: 1,
+      receivedTime: new Date(),
     },
   ];
 };

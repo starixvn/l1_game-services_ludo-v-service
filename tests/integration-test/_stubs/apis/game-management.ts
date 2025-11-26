@@ -1,5 +1,5 @@
 import nock from "nock";
-import appConfigs from "../../../../src/app-configs.IGT";
+import appConfigs from "../../../../src/app-configs.IGT.js";
 import { buildResult } from "../../helper/helper.js";
 
 export function stubUserInfo(userInfo, appConfigs) {

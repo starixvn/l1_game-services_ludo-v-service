@@ -4,12 +4,13 @@ const isWindows = process.platform === "win32";
 const npxCommand = isWindows ? "npx.cmd" : "npx";
 
 const startSetupDataProcess = (onSetupDataDone) => {
-  const setupDataProcess = spawn(npxCommand, [
-    "tsx",
-    "./tests/integration-test/_stubs/test-data-setup.ts",
-  ], {
-    shell: isWindows,
-  });
+  const setupDataProcess = spawn(
+    npxCommand,
+    ["tsx", "./tests/integration-test/_stubs/test-data-setup.ts"],
+    {
+      shell: isWindows,
+    },
+  );
 
   setupDataProcess.stdout.on("data", (data) => {
     console.log(`stdout: ${data}`);
@@ -28,12 +29,13 @@ const startSetupDataProcess = (onSetupDataDone) => {
 };
 
 const startServiceProcess = (onServiceStarted) => {
-  const serviceProcess = spawn(npxCommand, [
-    "tsx",
-    "./tests/integration-test/game-service-setup/game-service-app.ts",
-  ], {
-    shell: isWindows,
-  });
+  const serviceProcess = spawn(
+    npxCommand,
+    ["tsx", "./tests/integration-test/game-service-setup/game-service-app.ts"],
+    {
+      shell: isWindows,
+    },
+  );
 
   serviceProcess.stdout.on("data", (data) => {
     console.log(`stdout: ${data}`);
@@ -52,6 +54,7 @@ const startServiceProcess = (onServiceStarted) => {
 
 module.exports = async () => {
   return new Promise((resolve) => {
+    // Seed minimal round data for history tests, then start the game service
     startSetupDataProcess(() => {
       globalThis.processStartService = startServiceProcess(() => {
         console.log("Start service job done!");
