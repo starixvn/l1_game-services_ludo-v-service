@@ -14,6 +14,11 @@ import { BetLogs, Bets, Rounds, TempBets } from "../../src/models/index.js";
 jest.mock("sc-game-base", () => {
   return {
     Table: {
+      Crons: {
+        TableGameConfigBot: class MockTableGameConfigBot {
+          reset = jest.fn();
+        },
+      },
       TableContainerRegistry: class MockTableContainerRegistry {
         container: AwilixContainer;
 
