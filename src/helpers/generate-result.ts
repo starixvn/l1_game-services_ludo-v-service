@@ -28,7 +28,7 @@ export const generateResult = async (
     ];
     data.winners = [];
   }
-  const dice = [secureRandomRange(1, 6), secureRandomRange(1, 6)];
+  const { dice } = data;
   const diceState = new DiceState(dice);
   const { gameState, nextTurn } = await updateGameState(
     data.currentBoardState,

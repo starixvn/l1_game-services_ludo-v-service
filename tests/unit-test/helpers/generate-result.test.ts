@@ -67,6 +67,7 @@ describe("generateResult", () => {
         ],
         currentTurnIndex: 2,
         winners: [PlayerColor.RED],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -117,6 +118,7 @@ describe("generateResult", () => {
         ],
         currentTurnIndex: 0,
         winners: [PlayerColor.GREEN, PlayerColor.YELLOW],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -154,6 +156,7 @@ describe("generateResult", () => {
         currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
         currentTurnIndex: 0,
         winners: [PlayerColor.YELLOW],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -184,91 +187,9 @@ describe("generateResult", () => {
     });
   });
 
-  describe("Dice generation", () => {
-    test("should generate two dice with values between 1 and 6", async () => {
-      // Arrange
-      mockSecureRandomRange
-        .mockReturnValueOnce(3) // First die
-        .mockReturnValueOnce(5); // Second die
-
-      const data: GenerateResultData = {
-        currentBoardState: {
-          [PlayerColor.RED]: [0, 0, 0, 0],
-          [PlayerColor.GREEN]: [0, 0, 0, 0],
-          [PlayerColor.YELLOW]: [0, 0, 0, 0],
-          [PlayerColor.BLUE]: [0, 0, 0, 0],
-        },
-        currentPlayers: [
-          PlayerColor.RED,
-          PlayerColor.GREEN,
-          PlayerColor.YELLOW,
-          PlayerColor.BLUE,
-        ],
-        currentTurnIndex: 0,
-        winners: [],
-      };
-
-      mockUpdateGameState.mockResolvedValue({
-        gameState: {
-          board: data.currentBoardState,
-          currentPlayer: PlayerColor.RED,
-          playerAction: {
-            type: "move",
-            oldPosition: 0,
-            newPosition: 8,
-          },
-          winners: [],
-        },
-        nextTurn: 1,
-      } as any);
-
-      // Act
-      const result = await generateResult(data);
-
-      // Assert
-      expect(mockSecureRandomRange).toHaveBeenCalledWith(1, 6);
-      expect(mockSecureRandomRange).toHaveBeenCalledTimes(2);
-      expect(result.dice).toEqual([3, 5]);
-    });
-
-    test("should call secureRandomRange with correct parameters for dice", async () => {
-      // Arrange
-      mockSecureRandomRange.mockReturnValue(4);
-
-      const data: GenerateResultData = {
-        currentBoardState: {
-          [PlayerColor.RED]: [0, 0, 0, 0],
-          [PlayerColor.GREEN]: [0, 0, 0, 0],
-          [PlayerColor.YELLOW]: [0, 0, 0, 0],
-          [PlayerColor.BLUE]: [0, 0, 0, 0],
-        },
-        currentPlayers: [PlayerColor.RED],
-        currentTurnIndex: 0,
-        winners: [],
-      };
-
-      mockUpdateGameState.mockResolvedValue({
-        gameState: {
-          board: data.currentBoardState,
-          currentPlayer: PlayerColor.RED,
-          playerAction: { type: "skip", oldPosition: 0, newPosition: 0 },
-          winners: [],
-        },
-        nextTurn: 0,
-      } as any);
-
-      // Act
-      await generateResult(data);
-
-      // Assert
-      expect(mockSecureRandomRange).toHaveBeenCalledWith(1, 6);
-    });
-  });
-
   describe("Game state update", () => {
     test("should call updateGameState with correct parameters", async () => {
       // Arrange
-      mockSecureRandomRange.mockReturnValueOnce(2).mockReturnValueOnce(4);
 
       const data: GenerateResultData = {
         currentBoardState: {
@@ -285,6 +206,7 @@ describe("generateResult", () => {
         ],
         currentTurnIndex: 1,
         winners: [],
+        dice: [2, 4],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -335,6 +257,7 @@ describe("generateResult", () => {
         currentPlayers: [PlayerColor.RED],
         currentTurnIndex: 0,
         winners: [],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -377,6 +300,7 @@ describe("generateResult", () => {
         ],
         currentTurnIndex: 0,
         winners: [],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -429,6 +353,7 @@ describe("generateResult", () => {
         ],
         currentTurnIndex: 2,
         winners: [],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -472,6 +397,7 @@ describe("generateResult", () => {
         currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
         currentTurnIndex: 0,
         winners: [],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -507,6 +433,7 @@ describe("generateResult", () => {
         currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
         currentTurnIndex: 0,
         winners: [PlayerColor.YELLOW], // Previous game had a winner
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -546,6 +473,7 @@ describe("generateResult", () => {
         ],
         currentTurnIndex: 0,
         winners: [],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -588,6 +516,7 @@ describe("generateResult", () => {
         currentPlayers: [PlayerColor.RED],
         currentTurnIndex: 0,
         winners: [], // No previous winners - same game
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -627,6 +556,7 @@ describe("generateResult", () => {
         ],
         currentTurnIndex: 0,
         winners: [],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -676,6 +606,7 @@ describe("generateResult", () => {
         ],
         currentTurnIndex: 0,
         winners: [],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -719,6 +650,7 @@ describe("generateResult", () => {
         currentPlayers: [PlayerColor.RED],
         currentTurnIndex: 0,
         winners: [],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
@@ -764,6 +696,7 @@ describe("generateResult", () => {
         currentPlayers,
         currentTurnIndex: 0,
         winners: [],
+        dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({

@@ -1,6 +1,7 @@
 import { Core } from "sc-game-base";
 import GameData from "../game-data.js";
 import GameDefinition from "../game-definition.js";
+import { generateDice } from "../helpers/index.js";
 
 export class RoundResultConsumer extends Core.BaseEventConsumers
   .RoundResultConsumer {
@@ -8,8 +9,24 @@ export class RoundResultConsumer extends Core.BaseEventConsumers
   declare definition: GameDefinition;
 
   async generateResult() {
-    const data = this.getDataForGenerateResult();
+    const data = {
+      ...this.getDataForGenerateResult(),
+      ...this.resultFromAdmin(),
+    };
+
     this.gameData.result = await this.definition.generateResult(data);
+  }
+
+  resultFromAdmin() {
+    const { roundId, settlementResultFromAdmin } = this.gameData;
+    if (roundId === settlementResultFromAdmin?.roundId) {
+      const result = {
+        ...settlementResultFromAdmin?.result,
+      };
+      this.gameData.settlementResultFromAdmin = {} as any;
+      return result;
+    }
+    return {};
   }
 
   getDataForGenerateResult() {
@@ -18,6 +35,7 @@ export class RoundResultConsumer extends Core.BaseEventConsumers
       currentTurnIndex: this.gameData.result.nextTurnIndex,
       currentPlayers: this.gameData.result.currentPlayers,
       winners: this.gameData.result.winners,
+      dice: generateDice(),
     };
   }
 }

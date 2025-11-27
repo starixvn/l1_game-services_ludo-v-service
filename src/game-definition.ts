@@ -8,6 +8,7 @@ export type GenerateResultData = {
   currentTurnIndex: number;
   currentPlayers: PlayerColor[];
   winners: PlayerColor[];
+  dice: number[];
 };
 
 export default class GameDefinition extends Table.TableGameDefinition {

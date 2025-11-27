@@ -4,6 +4,7 @@ import { GenerateResultData } from "../../src/game-definition.js";
 import { generateOdds } from "../../src/helpers/generate-odds.js";
 import { generateResult } from "../../src/helpers/generate-result.js";
 import { generateSettlementResult } from "../../src/helpers/generate-settlement-result.js";
+import { generateDice } from "../../src/helpers/index.js";
 import { IResult } from "../../src/models/interfaces/result.js";
 import { ISettlementResult } from "../../src/models/interfaces/settlement-result";
 import { Odds } from "../../src/types.js";
@@ -174,6 +175,7 @@ const createInitialGameData = (): GenerateResultData => ({
   ],
   currentTurnIndex: Math.floor(Math.random() * 4),
   winners: [],
+  dice: generateDice(),
 });
 
 const calculateBetResult = (

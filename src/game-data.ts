@@ -15,6 +15,10 @@ export default class GameData extends Table.TableGameData {
     boostedChoices: boolean;
   };
   initRoundId: number;
+  declare settlementResultFromAdmin: {
+    roundId: number;
+    result: { dice: number[] };
+  };
   constructor(remainingTime: number) {
     super(remainingTime);
     this.result = {

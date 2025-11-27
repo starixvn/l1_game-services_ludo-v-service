@@ -3,6 +3,7 @@ import { RoundResultConsumer } from "../../../src/event-consumers/index.js";
 import GameData from "../../../src/game-data.js";
 import GameDefinition from "../../../src/game-definition.js";
 import { generateSettlementResult } from "../../../src/helpers/generate-settlement-result.js";
+import { generateDice } from "../../../src/helpers/index.js";
 import { IResult } from "../../../src/models/interfaces/result.js";
 
 jest.mock("sc-game-base", () => {
@@ -28,6 +29,12 @@ jest.mock("sc-game-base", () => {
       this.provablyFairConsumer = provablyFairConsumer;
     }
   };
+
+  jest.mock("../../../src/helpers/index.js", () => {
+    return {
+      generateDice: jest.fn(),
+    };
+  });
 
   const mockTableInGameConsumer = class MockTableInGameConsumer {
     constructor() {}
@@ -333,7 +340,8 @@ describe("RoundResultConsumer", () => {
       expect(data).toHaveProperty("currentTurnIndex");
       expect(data).toHaveProperty("currentPlayers");
       expect(data).toHaveProperty("winners");
-      expect(Object.keys(data)).toHaveLength(4);
+      expect(data).toHaveProperty("dice");
+      expect(Object.keys(data)).toHaveLength(5);
     });
 
     test("should handle empty winners array", () => {
@@ -506,6 +514,7 @@ describe("RoundResultConsumer", () => {
       (mockDeps.definition.generateResult as jest.Mock).mockResolvedValue(
         mockResult,
       );
+      (generateDice as jest.Mock).mockReturnValue([5, 5]);
 
       // Act
       await consumer.generateResult();
@@ -516,6 +525,7 @@ describe("RoundResultConsumer", () => {
         currentTurnIndex: 1,
         currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
         winners: [],
+        dice: [5, 5],
       });
     });
 
@@ -854,7 +864,7 @@ describe("RoundResultConsumer", () => {
       (mockDeps.definition.generateResult as jest.Mock).mockResolvedValue(
         mockResult,
       );
-
+      (generateDice as jest.Mock).mockReturnValue([3, 4]);
       // Act
       await consumer.generateResult();
 
@@ -875,6 +885,7 @@ describe("RoundResultConsumer", () => {
           PlayerColor.BLUE,
         ],
         winners: [],
+        dice: [3, 4],
       });
     });
 
