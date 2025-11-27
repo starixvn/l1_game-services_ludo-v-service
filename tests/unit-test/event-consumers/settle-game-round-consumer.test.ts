@@ -229,7 +229,11 @@ describe("SettleGameRoundConsumer", () => {
 
       // Assert
       expect(roundResult.result.board).toEqual(result.board);
-      expect(roundResult.result.action).toEqual(result.action);
+      expect(roundResult.result.action).toEqual({
+        ...result.action,
+        player: result.action.playerColor,
+        playerColor: undefined,
+      });
     });
 
     test("should handle different dice combinations", () => {
@@ -898,7 +902,11 @@ describe("SettleGameRoundConsumer", () => {
           board: convertBoardState(mockResult.board),
           dice1: 3,
           dice2: 4,
-          action: mockResult.action,
+          action: {
+            ...mockResult.action,
+            player: mockResult.action.playerColor,
+            playerColor: undefined,
+          },
         },
         settlementResult: mockSettlementResult,
         roundId: 10,
@@ -913,6 +921,11 @@ describe("SettleGameRoundConsumer", () => {
         board: {},
         winners: [],
         dice: [3, 4],
+        action: {
+          oldPosition: 0,
+          newPosition: 7,
+          playerColor: PlayerColor.RED,
+        },
       } as any);
       mockDeps.definition.settle = jest.fn().mockReturnValue({});
       consumer.gameData.roundId = 10;
@@ -1015,6 +1028,11 @@ describe("SettleGameRoundConsumer", () => {
         board: {},
         winners: [],
         dice: [3, 4],
+        action: {
+          oldPosition: 0,
+          newPosition: 7,
+          playerColor: PlayerColor.RED,
+        },
       } as any;
       const mockSettlementResult = { big: true } as any;
       consumer.generateResult = jest.fn().mockReturnValue(mockResult);
@@ -1035,7 +1053,10 @@ describe("SettleGameRoundConsumer", () => {
       // Assert
       expect(consumer.settleBets).toHaveBeenCalledWith({
         settlementResult: mockSettlementResult,
-        result: mockResult,
+        result: {
+          ...mockResult,
+          action: mockResult.action,
+        },
         roundId: 10,
         time: mockTime,
       });
@@ -1049,6 +1070,11 @@ describe("SettleGameRoundConsumer", () => {
         board: {},
         winners: [],
         dice: [3, 4],
+        action: {
+          oldPosition: 0,
+          newPosition: 7,
+          playerColor: PlayerColor.RED,
+        },
       } as any);
       mockDeps.definition.settle = jest.fn().mockReturnValue({});
       consumer.gameData.roundId = 10;
