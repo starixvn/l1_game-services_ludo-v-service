@@ -23,7 +23,6 @@ export class RoundResultConsumer extends Core.BaseEventConsumers
       const result = {
         ...settlementResultFromAdmin?.result,
       };
-      this.gameData.settlementResultFromAdmin = {} as any;
       return result;
     }
     return {};

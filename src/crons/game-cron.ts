@@ -106,7 +106,7 @@ export class GameCron extends Table.Crons.TableGameCron {
       await this.roundResultConsumer.generateResult();
       await this.settleGameRoundConsumer.settleRound();
       await this.promotionFreeSpinsConsumer.loadPromotionsRunning();
-      this.gameData.settlementResultFromAdmin = {};
+      this.gameData.settlementResultFromAdmin = {} as any;
     } else if (remainingTime < durations.placingBets) {
       this.bot && (await this.bot.run());
       this.runningRoundInfoPublisher.publish();
