@@ -9,7 +9,8 @@
     "test": "jest --testPathPatterns=tests/unit-test/",
     "test-coverage": "jest --collect-coverage --testPathPatterns=tests/unit-test/",
     "test-integration": "jest --config=jest.integration.config.cjs --testPathPatterns=tests/integration-test/ludo.test.ts",
-    "start": "node --max-old-space-size=8192 --import=extensionless/register ./dist/app.js"
+    "start": "node --max-old-space-size=8192 --import=extensionless/register ./dist/app.js",
+    "simulation": "tsx tests/simulation/run-simulation.ts -r 10000 -m 0.05 -s random"
   },
   "keywords": [],
   "author": "",

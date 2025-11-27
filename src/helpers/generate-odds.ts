@@ -8,7 +8,7 @@ import {
   isSkipAction,
   PlayerColor,
 } from "@rd/ludo-rules";
-import { ODDS_KEYS } from "../constants.js";
+import { BET_CHOICES, ODDS_KEYS } from "../constants.js";
 import { IResult } from "../models/interfaces/result.js";
 import { Odds, OddsValue } from "../types.js";
 import { ruleBotInstance } from "./rule-bot-instance.js";
@@ -27,6 +27,8 @@ export const generateOdds = async (margin: number, currentResult: IResult) => {
       await calculateActionOdds(dices, currentResult, raceMap, oddCounts);
     }
   }
+
+  filterOdds(oddCounts);
 
   return ODDS_KEYS.reduce((acc, key) => {
     const count = oddCounts[key as keyof Odds];
@@ -81,4 +83,31 @@ const calculateActionOdds = async (
   oddCounts.noMove += skip ? 1 : 0;
   oddCounts.noRelease += !release ? 1 : 0;
   oddCounts.noStable += !goStable ? 1 : 0;
+};
+
+const filterOdds = (oddCounts: Odds) => {
+  const needToFilter = [
+    {
+      choice: BET_CHOICES.kick,
+      opposite: BET_CHOICES.noKick,
+    },
+    {
+      choice: BET_CHOICES.release,
+      opposite: BET_CHOICES.noRelease,
+    },
+    {
+      choice: BET_CHOICES.goStable,
+      opposite: BET_CHOICES.noStable,
+    },
+  ];
+
+  needToFilter.forEach((choice) => {
+    if (
+      oddCounts[choice.choice as keyof Odds] ===
+      oddCounts[BET_CHOICES.move as keyof Odds]
+    ) {
+      oddCounts[choice.choice as keyof Odds] = 0;
+      oddCounts[choice.opposite as keyof Odds] = 0;
+    }
+  });
 };
