@@ -20,10 +20,9 @@ export class RoundResultConsumer extends Core.BaseEventConsumers
   resultFromAdmin() {
     const { roundId, settlementResultFromAdmin } = this.gameData;
     if (roundId === settlementResultFromAdmin?.roundId) {
-      const result = {
+      return {
         ...settlementResultFromAdmin?.result,
       };
-      return result;
     }
     return {};
   }
