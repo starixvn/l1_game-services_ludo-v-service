@@ -10,31 +10,11 @@ jest.mock("@rd/ludo-rules", () => ({
     YELLOW: "yellow",
     BLUE: "blue",
   },
-  getRaceMap: jest.fn((board) => {
-    // Simple mock implementation - map positions to colors
-    const raceMap: any = {};
-    Object.entries(board).forEach(([color, positions]: [string, any]) => {
-      (positions as number[]).forEach((pos: number) => {
-        if (pos > 0) {
-          raceMap[pos] = color;
-        }
-      });
-    });
-    return raceMap;
-  }),
   isSkipAction: jest.fn((action) => action.type === "skip"),
   isReleaseAction: jest.fn((action) => action.type === "release"),
   isGoToStableAction: jest.fn((action) => {
     // Stable area is typically position >= 56
     return action.type === "move" && action.newPosition >= 56;
-  }),
-  isKickAction: jest.fn((action, raceMap) => {
-    // Check if newPosition has another player
-    return (
-      raceMap &&
-      raceMap[action.newPosition] !== undefined &&
-      action.type !== "skip"
-    );
   }),
 }));
 
@@ -49,6 +29,7 @@ describe("generateSettlementResult", () => {
       [PlayerColor.YELLOW]: [0, 0, 0, 0],
       [PlayerColor.BLUE]: [0, 0, 0, 0],
     },
+    kickedPlayer?: PlayerColor,
   ): IResult => ({
     dice,
     action,
@@ -61,6 +42,7 @@ describe("generateSettlementResult", () => {
       PlayerColor.BLUE,
     ],
     winners: [],
+    kickedPlayer,
   });
 
   describe("Function output structure", () => {
@@ -397,14 +379,8 @@ describe("generateSettlementResult", () => {
   });
 
   describe("Action type - Kick/NoKick", () => {
-    test("should detect kick when another player occupies the destination position", () => {
+    test("should detect kick when kickedPlayer is defined", () => {
       // Arrange
-      const board = {
-        [PlayerColor.RED]: [5, 0, 0, 0],
-        [PlayerColor.GREEN]: [10, 0, 0, 0], // Green piece at position 10
-        [PlayerColor.YELLOW]: [0, 0, 0, 0],
-        [PlayerColor.BLUE]: [0, 0, 0, 0],
-      };
       const result = createMockResult(
         [3, 2],
         {
@@ -413,7 +389,13 @@ describe("generateSettlementResult", () => {
           newPosition: 10,
           playerColor: PlayerColor.RED,
         },
-        board,
+        {
+          [PlayerColor.RED]: [10, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0], // Green piece was kicked back to home
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        PlayerColor.GREEN, // kickedPlayer indicates GREEN was kicked
       );
 
       // Act
@@ -424,14 +406,19 @@ describe("generateSettlementResult", () => {
       expect(settlement.noKick).toBe(false);
     });
 
-    test("should return noKick=true when moving to an empty position", () => {
+    test("should return noKick=true when kickedPlayer is undefined", () => {
       // Arrange
-      const result = createMockResult([3, 2], {
-        type: "move",
-        oldPosition: 5,
-        newPosition: 10,
-        playerColor: PlayerColor.RED,
-      });
+      const result = createMockResult(
+        [3, 2],
+        {
+          type: "move",
+          oldPosition: 5,
+          newPosition: 10,
+          playerColor: PlayerColor.RED,
+        },
+        undefined,
+        undefined, // No kicked player
+      );
 
       // Act
       const settlement = generateSettlementResult(result);
@@ -441,12 +428,17 @@ describe("generateSettlementResult", () => {
       expect(settlement.noKick).toBe(true);
     });
 
-    test("should return noKick=true for skip action", () => {
+    test("should return noKick=true for skip action without kickedPlayer", () => {
       // Arrange
-      const result = createMockResult([2, 1], {
-        type: "skip",
-        playerColor: PlayerColor.RED,
-      });
+      const result = createMockResult(
+        [2, 1],
+        {
+          type: "skip",
+          playerColor: PlayerColor.RED,
+        },
+        undefined,
+        undefined,
+      );
 
       // Act
       const settlement = generateSettlementResult(result);
@@ -456,11 +448,11 @@ describe("generateSettlementResult", () => {
       expect(settlement.noKick).toBe(true);
     });
 
-    test("should detect kick with multiple opponent pieces on board", () => {
-      // Arrange
+    test("should detect kick regardless of board state when kickedPlayer is set", () => {
+      // Arrange - board state doesn't matter for kick detection anymore
       const board = {
-        [PlayerColor.RED]: [5, 15, 0, 0],
-        [PlayerColor.GREEN]: [10, 20, 0, 0],
+        [PlayerColor.RED]: [10, 0, 0, 0],
+        [PlayerColor.GREEN]: [0, 0, 0, 0], // Already sent home after kick
         [PlayerColor.YELLOW]: [25, 0, 0, 0],
         [PlayerColor.BLUE]: [30, 0, 0, 0],
       };
@@ -473,6 +465,51 @@ describe("generateSettlementResult", () => {
           playerColor: PlayerColor.RED,
         },
         board,
+        PlayerColor.GREEN, // kickedPlayer is the source of truth
+      );
+
+      // Act
+      const settlement = generateSettlementResult(result);
+
+      // Assert
+      expect(settlement.kick).toBe(true);
+      expect(settlement.noKick).toBe(false);
+    });
+
+    test("should detect kick for different kicked player colors", () => {
+      // Arrange
+      const result = createMockResult(
+        [4, 3],
+        {
+          type: "move",
+          oldPosition: 10,
+          newPosition: 17,
+          playerColor: PlayerColor.RED,
+        },
+        undefined,
+        PlayerColor.BLUE, // BLUE was kicked
+      );
+
+      // Act
+      const settlement = generateSettlementResult(result);
+
+      // Assert
+      expect(settlement.kick).toBe(true);
+      expect(settlement.noKick).toBe(false);
+    });
+
+    test("should detect kick for YELLOW player", () => {
+      // Arrange
+      const result = createMockResult(
+        [2, 4],
+        {
+          type: "move",
+          oldPosition: 20,
+          newPosition: 26,
+          playerColor: PlayerColor.GREEN,
+        },
+        undefined,
+        PlayerColor.YELLOW,
       );
 
       // Act
@@ -558,8 +595,8 @@ describe("generateSettlementResult", () => {
     test("should handle release action that also results in a kick", () => {
       // Arrange
       const board = {
-        [PlayerColor.RED]: [0, 0, 0, 0],
-        [PlayerColor.GREEN]: [1, 0, 0, 0], // Green at position 1
+        [PlayerColor.RED]: [1, 0, 0, 0], // Red released to position 1
+        [PlayerColor.GREEN]: [0, 0, 0, 0], // Green was kicked back to home
         [PlayerColor.YELLOW]: [0, 0, 0, 0],
         [PlayerColor.BLUE]: [0, 0, 0, 0],
       };
@@ -572,6 +609,7 @@ describe("generateSettlementResult", () => {
           playerColor: PlayerColor.RED,
         },
         board,
+        PlayerColor.GREEN, // Green was kicked during release
       );
 
       // Act

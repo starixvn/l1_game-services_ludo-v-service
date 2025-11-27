@@ -1,7 +1,5 @@
 import {
-  getRaceMap,
   isGoToStableAction,
-  isKickAction,
   isReleaseAction,
   isSkipAction,
 } from "@rd/ludo-rules";
@@ -14,7 +12,7 @@ export const generateSettlementResult = (result: IResult) => {
   const isSkip = isSkipAction(result.action);
   const isRelease = isReleaseAction(result.action, result.action.playerColor);
   const isGoToStable = isGoToStableAction(result.action);
-  const isKick = isKickAction(result.action, getRaceMap(result.board));
+  const isKick = result.kickedPlayer !== undefined;
   return {
     odd: !isEven,
     even: isEven,
