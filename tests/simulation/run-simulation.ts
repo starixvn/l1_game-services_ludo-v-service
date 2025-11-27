@@ -290,6 +290,8 @@ const runSimulation = async (
 
     const odds = await generateOdds(config.margin, preRoundResult);
     const bets = getBets(config, odds);
+    const dice = generateDice();
+    gameData.dice = dice;
     const result = await generateResult(gameData);
 
     gameData.currentBoardState = result.board;
