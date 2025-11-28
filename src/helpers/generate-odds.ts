@@ -87,27 +87,19 @@ const calculateActionOdds = async (
 
 const filterOdds = (oddCounts: Odds) => {
   const needToFilter = [
-    {
-      choice: BET_CHOICES.kick,
-      opposite: BET_CHOICES.noKick,
-    },
-    {
-      choice: BET_CHOICES.release,
-      opposite: BET_CHOICES.noRelease,
-    },
-    {
-      choice: BET_CHOICES.goStable,
-      opposite: BET_CHOICES.noStable,
-    },
+    BET_CHOICES.kick,
+    BET_CHOICES.release,
+    BET_CHOICES.goStable,
   ];
 
-  needToFilter.forEach((choice) => {
+  for (const choice of needToFilter) {
     if (
-      oddCounts[choice.choice as keyof Odds] ===
+      oddCounts[choice as keyof Odds] ===
       oddCounts[BET_CHOICES.move as keyof Odds]
     ) {
-      oddCounts[choice.choice as keyof Odds] = 0;
-      oddCounts[choice.opposite as keyof Odds] = 0;
+      oddCounts[BET_CHOICES.move as keyof Odds] = 0;
+      oddCounts[BET_CHOICES.noMove as keyof Odds] = 0;
+      break;
     }
-  });
+  }
 };
