@@ -11,6 +11,7 @@ declare module "sc-game-base" {
   namespace Table.EventConsumers {
     interface TableInGameConsumer {
       getUserInfo(realPlayer: any): Promise<any>;
+      consume(realPlayer: RealPlayer): Promise<void>;
     }
   }
 }
@@ -19,6 +20,15 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
   declare gameData: GameData;
   declare roundQuery: RoundQuery;
   declare definition: GameDefinition;
+
+  async consume(realPlayer: RealPlayer) {
+    super.consume(realPlayer);
+    const { gameConfigs } = this.gameData;
+    const disabled = !gameConfigs || !gameConfigs.enabled;
+    if (!disabled) {
+      this.gameData.realPlayers[realPlayer.socketClient.id].sendedInGame = true;
+    }
+  }
 
   async buildPayload(realPlayer: RealPlayer) {
     const user = await this.getUserInfo(realPlayer);

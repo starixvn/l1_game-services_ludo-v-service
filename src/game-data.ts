@@ -1,7 +1,7 @@
 import { PlayerColor } from "@rd/ludo-rules";
 import { Table } from "sc-game-base";
 import { IResult } from "./models/interfaces/result.js";
-import { Odds } from "./types.js";
+import { Odds, RealPlayer } from "./types.js";
 
 export default class GameData extends Table.TableGameData {
   declare gameConfigs: {
@@ -51,5 +51,8 @@ export default class GameData extends Table.TableGameData {
   declare currencyGroupGames: { groupId: number; name: string }[];
   declare ingame: {
     [key: string]: { ownBets: { [key: string]: number }; clientSeed: string };
+  };
+  declare realPlayers: {
+    [key: string]: RealPlayer;
   };
 }

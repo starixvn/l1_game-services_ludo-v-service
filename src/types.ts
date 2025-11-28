@@ -43,4 +43,6 @@ export type RealPlayer = {
     totalWinAmount: number;
     claimExpirationDate: Date;
   };
+  socketClient: { id: string; emit: (event: string, payload: any) => void };
+  sendedInGame?: boolean;
 };
