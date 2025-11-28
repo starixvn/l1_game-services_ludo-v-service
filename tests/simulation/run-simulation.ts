@@ -191,7 +191,7 @@ const calculateBetResult = (
     if (betAmount === 0 || betAmount === undefined) continue;
 
     const oddsValue = odds[choice as OddsKey];
-    if (oddsValue === null) continue;
+    if (oddsValue === 0) continue;
 
     const won = settlementResult[choice as keyof ISettlementResult];
     const winAmount = won ? betAmount * oddsValue : 0;
@@ -216,7 +216,7 @@ const getBets = (
   const bets: Partial<Record<OddsKey, number>> = {};
 
   const addBetIfAvailable = (key: string): void => {
-    if (odds[key as OddsKey] !== null) {
+    if (odds[key as OddsKey] !== 0) {
       bets[key as OddsKey] = config.betAmount;
     }
   };
@@ -234,7 +234,7 @@ const getBets = (
 
     case "random": {
       const availableChoices = ODDS_KEYS.filter(
-        (key) => odds[key as OddsKey] !== null,
+        (key) => odds[key as OddsKey] !== 0,
       );
       if (availableChoices.length > 0) {
         const randomChoice =

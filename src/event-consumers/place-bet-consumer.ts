@@ -14,7 +14,7 @@ export class PlaceBetConsumer extends Core.BaseEventConsumers.PlaceBetConsumer {
       {
         failure:
           this.gameData.odds[betChoice as keyof typeof this.gameData.odds] ===
-          null,
+          0,
         notice: this.getNoticeObj(helpers.noticeHelper.invalidBet, undefined),
       },
     ];

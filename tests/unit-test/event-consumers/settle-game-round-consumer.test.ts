@@ -291,6 +291,83 @@ describe("SettleGameRoundConsumer", () => {
         expect(roundResult.result.dice2).toEqual(dice[1]);
       });
     });
+
+    test("should filter out settlement result entries where odds are 0", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new SettleGameRoundConsumer(mockDeps);
+      // Set some odds to 0
+      mockDeps.gameData.odds = {
+        big: 1.5,
+        small: 0, // This should be filtered out
+        odd: 2.0,
+        even: 0, // This should be filtered out
+        kick: 0, // This should be filtered out
+        noKick: 1.2,
+        move: 1.5,
+        noMove: 0, // This should be filtered out
+        release: 4.0,
+        noRelease: 1.1,
+        goStable: 0, // This should be filtered out
+        noStable: 1.05,
+      };
+      const result: IResult = {
+        board: {
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [PlayerColor.RED],
+        winners: [],
+        dice: [3, 5],
+        action: {
+          oldPosition: 0,
+          newPosition: 7,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      const settlementResult: ISettlementResult = {
+        big: false,
+        small: true,
+        odd: true,
+        even: false,
+        kick: false,
+        noKick: true,
+        move: true,
+        noMove: false,
+        release: false,
+        noRelease: true,
+        goStable: false,
+        noStable: true,
+      };
+      const roundId = 10;
+
+      // Act
+      const roundResult = consumer.collectRoundResult(
+        result,
+        settlementResult,
+        roundId,
+      );
+
+      // Assert
+      expect(roundResult.settlementResult).toEqual({
+        big: false,
+        odd: true,
+        noKick: true,
+        move: true,
+        release: false,
+        noRelease: true,
+        noStable: true,
+      });
+      // Verify filtered out entries are not present
+      expect(roundResult.settlementResult.small).toBeUndefined();
+      expect(roundResult.settlementResult.even).toBeUndefined();
+      expect(roundResult.settlementResult.kick).toBeUndefined();
+      expect(roundResult.settlementResult.noMove).toBeUndefined();
+      expect(roundResult.settlementResult.goStable).toBeUndefined();
+    });
   });
 
   describe("calculateBetResult", () => {
@@ -1364,6 +1441,21 @@ function createMockDependencies() {
   mockGameData.initRoundId = 1;
   mockGameData.exchangeRates = { exId: 1, code: { USD: 1 } };
   mockGameData.winningPlayers = [];
+  // Set default odds (all non-zero) so existing tests continue to work
+  mockGameData.odds = {
+    big: 1.5,
+    small: 2.0,
+    odd: 2.0,
+    even: 2.0,
+    kick: 3.0,
+    noKick: 1.2,
+    move: 1.5,
+    noMove: 2.5,
+    release: 4.0,
+    noRelease: 1.1,
+    goStable: 5.0,
+    noStable: 1.05,
+  };
 
   const mockDefinition = {
     settle: jest.fn(),

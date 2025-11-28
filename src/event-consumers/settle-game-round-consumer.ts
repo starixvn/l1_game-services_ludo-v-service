@@ -56,6 +56,19 @@ export class SettleGameRoundConsumer extends Table.EventConsumers
     settlementResult: ISettlementResult,
     roundId: number,
   ) {
+    // Filter out settlement result entries where odds are 0
+    const filteredSettlementResult = Object.entries(settlementResult).reduce(
+      (acc, [key, value]) => {
+        const oddsValue =
+          this.gameData.odds[key as keyof typeof this.gameData.odds];
+        if (oddsValue !== 0) {
+          acc[key as keyof ISettlementResult] = value;
+        }
+        return acc;
+      },
+      {} as Partial<ISettlementResult>,
+    );
+
     return {
       result: {
         board: convertBoardState(result.board),
@@ -67,7 +80,7 @@ export class SettleGameRoundConsumer extends Table.EventConsumers
           playerColor: undefined,
         },
       },
-      settlementResult,
+      settlementResult: filteredSettlementResult,
       roundId,
     };
   }

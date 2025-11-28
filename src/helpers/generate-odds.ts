@@ -10,7 +10,7 @@ import {
 } from "@rd/ludo-rules";
 import { BET_CHOICES, ODDS_KEYS } from "../constants.js";
 import { IResult } from "../models/interfaces/result.js";
-import { Odds, OddsValue } from "../types.js";
+import { Odds } from "../types.js";
 import { ruleBotInstance } from "./rule-bot-instance.js";
 
 export const generateOdds = async (margin: number, currentResult: IResult) => {
@@ -35,8 +35,8 @@ export const generateOdds = async (margin: number, currentResult: IResult) => {
     const result =
       count >= 2 && count <= 34
         ? Math.floor((1 / (count / 36) - margin) * 100) / 100
-        : null;
-    acc[key as keyof Odds] = result as OddsValue;
+        : 0;
+    acc[key as keyof Odds] = result;
     return acc;
   }, {} as Odds);
 };
