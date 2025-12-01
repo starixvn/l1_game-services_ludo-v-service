@@ -1505,10 +1505,10 @@
   dependencies:
     "@opentelemetry/instrumentation" "^0.52.0 || ^0.53.0 || ^0.54.0 || ^0.55.0 || ^0.56.0 || ^0.57.0"
 
-"@rd/ludo-rules@1.0.1-beta.10":
-  version "1.0.1-beta.10"
-  resolved "https://npm.lumigame.com/@rd/ludo-rules/-/ludo-rules-1.0.1-beta.10.tgz#e845ec9ef5fd435032e3bbab4651fcf0aa1dc9d8"
-  integrity sha512-B9Zg8BKa7X5n1shMykQEF3vjU0Htzle3cc25QQRRDqDyrYGnTJXbEcjNqTjkycBbA4451OcSWbQXDp2xDkN9hA==
+"@rd/ludo-rules@1.0.1-beta.11":
+  version "1.0.1-beta.11"
+  resolved "https://npm.lumigame.com/@rd/ludo-rules/-/ludo-rules-1.0.1-beta.11.tgz#66d565a5be52be5596777ce9ba0c4aaed389f5ea"
+  integrity sha512-5Bdpo8ECwpWUoRn9ddRE0jWOgfFpdo0a8ytN61mrO9nw+vE2A+hCVcsTqfoZvAZ9tQ3FcriQ2Vn68XZmCntTCQ==
   dependencies:
     chance "^1.1.13"
 
