@@ -7,6 +7,7 @@ import {
 import { RunningRoundInfoPublisher } from "../event-publishers/index.js";
 import GameData from "../game-data.js";
 import GameDefinition from "../game-definition.js";
+import { MARGIN_KEYS, ODDS_KEYS } from "../constants.js";
 
 export class GameCron extends Table.Crons.TableGameCron {
   declare bot: Table.Crons.TableGameBot;
@@ -68,9 +69,17 @@ export class GameCron extends Table.Crons.TableGameCron {
   }
 
   async calculateOdds() {
-    const { margin } = this.gameData.gameConfigs.odds;
+    const odds = this.gameData.gameConfigs.odds;
+    const margins = ODDS_KEYS.map((key) => key as keyof typeof odds).reduce(
+      (acc, key) => {
+        const marginKey = MARGIN_KEYS[key as keyof typeof MARGIN_KEYS];
+        acc[key] = odds[marginKey];
+        return acc;
+      },
+      {} as { [key: string]: number },
+    );
     this.gameData.odds = await this.definition.generateOdds(
-      margin,
+      margins,
       this.gameData.result,
     );
   }

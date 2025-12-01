@@ -183,6 +183,11 @@ export const createBetLogData = (uid: string) => {
       amount: 10,
       roundId: 1,
       receivedTime: new Date(),
+      currency: "INH",
+      odds: roundOdds,
+      operatorId: "1234",
+      rate: 1,
+      playerId: "1234567890",
     },
   ];
 };

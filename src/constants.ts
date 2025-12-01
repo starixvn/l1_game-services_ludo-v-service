@@ -28,3 +28,18 @@ export const ODDS_KEYS = [
   BET_CHOICES.goStable,
   BET_CHOICES.noStable,
 ];
+
+export const MARGIN_KEYS = {
+  big: "marginBig",
+  small: "marginSmall",
+  odd: "marginOdd",
+  even: "marginEven",
+  kick: "marginKick",
+  noKick: "marginNoKick",
+  move: "marginMove",
+  noMove: "marginNoMove",
+  release: "marginRelease",
+  noRelease: "marginNoRelease",
+  goStable: "marginGoStable",
+  noStable: "marginNoStable",
+};

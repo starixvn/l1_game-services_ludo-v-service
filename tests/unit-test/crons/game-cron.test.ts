@@ -1,6 +1,10 @@
 import { PlayerColor } from "@rd/ludo-rules";
 import { GameCron } from "../../../src/crons/game-cron.js";
 import GameData from "../../../src/game-data.js";
+import {
+  generateMargins,
+  generateMarginWithoutPrefix,
+} from "../__mock__/margins.js";
 
 // Mock sc-game-base to avoid constructor issues
 jest.mock("sc-game-base", () => {
@@ -349,7 +353,7 @@ describe("GameCron", () => {
       // Arrange
       const mockDeps = createMockDependencies();
       const gameCron = new GameCron(mockDeps);
-      const margin = 0.05;
+      const margins = generateMargins(0.05);
       const result = {
         board: {
           [PlayerColor.RED]: [0, 0, 0, 0],
@@ -370,7 +374,7 @@ describe("GameCron", () => {
       gameCron.gameData.gameConfigs = {
         gameId: 1,
         enabled: true,
-        odds: { margin },
+        odds: margins,
         originalOdds: {} as any,
         enableFreeBet: false,
         boostedChoices: false,
@@ -384,7 +388,7 @@ describe("GameCron", () => {
 
       // Assert
       expect(mockDeps.definition.generateOdds).toHaveBeenCalledWith(
-        margin,
+        generateMarginWithoutPrefix(0.05),
         result,
       );
       expect(mockDeps.definition.generateOdds).toHaveBeenCalledTimes(1);
@@ -403,7 +407,7 @@ describe("GameCron", () => {
       gameCron.gameData.gameConfigs = {
         gameId: 1,
         enabled: true,
-        odds: { margin: 0.05 },
+        odds: generateMargins(0.05),
         originalOdds: {} as any,
         enableFreeBet: false,
         boostedChoices: false,
@@ -421,11 +425,11 @@ describe("GameCron", () => {
       // Arrange
       const mockDeps = createMockDependencies();
       const gameCron = new GameCron(mockDeps);
-      const customMargin = 0.08;
+      const customMargins = generateMargins(0.08);
       gameCron.gameData.gameConfigs = {
         gameId: 1,
         enabled: true,
-        odds: { margin: customMargin },
+        odds: customMargins,
         originalOdds: {} as any,
         enableFreeBet: false,
         boostedChoices: false,
@@ -436,7 +440,7 @@ describe("GameCron", () => {
 
       // Assert
       expect(mockDeps.definition.generateOdds).toHaveBeenCalledWith(
-        customMargin,
+        generateMarginWithoutPrefix(0.08),
         expect.any(Object),
       );
     });
@@ -615,7 +619,10 @@ describe("GameCron", () => {
       const gameCron = new GameCron(mockDeps);
       gameCron.gameData.remainingTime = 0;
       gameCron.gameData.disabled = false;
-      gameCron.gameData.settlementResultFromAdmin = { test: "data" };
+      gameCron.gameData.settlementResultFromAdmin = {
+        roundId: 1,
+        result: { dice: [1, 2] },
+      };
       gameCron.definition.durations = {
         wholeRound: 30000,
         placingBets: 20000,
@@ -759,8 +766,8 @@ describe("GameCron", () => {
       gameCron.gameData.remainingTime = 0;
       gameCron.gameData.disabled = false;
       gameCron.gameData.settlementResultFromAdmin = {
-        someKey: "someValue",
-        anotherKey: 123,
+        roundId: 1,
+        result: { dice: [1, 2] },
       };
       gameCron.definition.durations = {
         wholeRound: 30000,
@@ -937,7 +944,7 @@ function createMockDependencies() {
       playerColor: PlayerColor.RED,
     },
   };
-  mockGameData.settlementResultFromAdmin = {};
+  mockGameData.settlementResultFromAdmin = {} as any;
 
   const mockDefinition = {
     durations: {

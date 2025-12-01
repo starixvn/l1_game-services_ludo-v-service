@@ -47,6 +47,7 @@ const createMockUserSession = (playerId: string, playerName: string) => ({
   language: "en-US",
   currencyCode: mockCurrency.name,
   currencyName: mockCurrency.name,
+  currency: mockCurrency.name,
   currencyGroupId: mockCurrencyGroupGame.groupId,
   isTestCurrency: false,
   multiplier: 1,
@@ -82,7 +83,18 @@ const testUsers = [
 // Mock data for various services
 const mockGameConfig = {
   odds: {
-    margin: 0.05,
+    marginMove: 0.04,
+    marginNoMove: 0.04,
+    marginKick: 0.04,
+    marginNoKick: 0.04,
+    marginRelease: 0.04,
+    marginNoRelease: 0.04,
+    marginStable: 0.04,
+    marginNoStable: 0.04,
+    marginBig: 0.04,
+    marginSmall: 0.04,
+    marginOdd: 0.04,
+    marginEven: 0.04,
   },
   enabled: true,
 };

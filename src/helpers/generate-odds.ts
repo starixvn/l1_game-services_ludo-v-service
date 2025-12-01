@@ -13,7 +13,10 @@ import { IResult } from "../models/interfaces/result.js";
 import { Odds } from "../types.js";
 import { ruleBotInstance } from "./rule-bot-instance.js";
 
-export const generateOdds = async (margin: number, currentResult: IResult) => {
+export const generateOdds = async (
+  margins: { [key: string]: number },
+  currentResult: IResult,
+) => {
   const oddCounts: Odds = ODDS_KEYS.reduce((acc, key) => {
     acc[key as keyof Odds] = 0;
     return acc;
@@ -34,7 +37,7 @@ export const generateOdds = async (margin: number, currentResult: IResult) => {
     const count = oddCounts[key as keyof Odds];
     const result =
       count >= 2 && count <= 34
-        ? Math.floor((1 / (count / 36) - margin) * 100) / 100
+        ? Math.floor((1 / (count / 36) - margins[key]) * 100) / 100
         : 0;
     acc[key as keyof Odds] = result;
     return acc;

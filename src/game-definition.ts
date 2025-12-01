@@ -19,13 +19,19 @@ export default class GameDefinition extends Table.TableGameDefinition {
   };
 
   declare generateResult: (data: GenerateResultData) => Promise<IResult>;
-  declare generateOdds: (margin: number, currentResult: IResult) => any;
+  declare generateOdds: (
+    margins: { [key: string]: number },
+    currentResult: IResult,
+  ) => any;
   constructor(
     gameSettings: any,
     generateResult: (data: GenerateResultData) => any,
     settle: (data: IResult) => any,
     generateRawResultForHash: any,
-    generateOdds: (margin: number, currentResult: IResult) => any,
+    generateOdds: (
+      margins: { [key: string]: number },
+      currentResult: IResult,
+    ) => any,
   ) {
     super(gameSettings, generateResult, settle, generateRawResultForHash);
     this.generateResult = generateResult;

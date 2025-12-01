@@ -33,6 +33,13 @@ import {
   isReleaseAction,
   isSkipAction,
 } from "@rd/ludo-rules";
+import { BET_CHOICES, MARGIN_KEYS } from "../../../src/constants.js";
+import {
+  generateMargins,
+  generateMarginWithoutPrefix,
+} from "../__mock__/margins.js";
+
+const mockMargins = generateMarginWithoutPrefix(0.05);
 
 describe("generateOdds", () => {
   let mockResult: IResult;
@@ -103,7 +110,7 @@ describe("generateOdds", () => {
   describe("Odds calculation structure", () => {
     test("should return odds object with all 12 required keys", async () => {
       // Act
-      const odds = await generateOdds(0.05, mockResult);
+      const odds = await generateOdds(mockMargins, mockResult);
 
       // Assert
       expect(odds).toHaveProperty("big");
@@ -122,12 +129,13 @@ describe("generateOdds", () => {
   });
 
   describe("Dice probability calculations", () => {
+    const margins = generateMarginWithoutPrefix(0);
     test("should calculate big odds based on dice combinations > 6", async () => {
       // Arrange
       mockIsSkipAction.mockReturnValue(true);
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       // Dice sum > 6: 21 combinations out of 36
@@ -140,7 +148,7 @@ describe("generateOdds", () => {
       mockIsSkipAction.mockReturnValue(true);
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       // Dice sum <= 6: 15 combinations out of 36
@@ -153,7 +161,7 @@ describe("generateOdds", () => {
       mockIsSkipAction.mockReturnValue(true);
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       // Odd sums: 18 combinations out of 36
@@ -166,7 +174,7 @@ describe("generateOdds", () => {
       mockIsSkipAction.mockReturnValue(true);
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       // Even sums: 18 combinations out of 36
@@ -178,38 +186,45 @@ describe("generateOdds", () => {
   describe("Margin application", () => {
     test("should apply margin reduction to all odds", async () => {
       // Arrange
-      const margin = 0.1;
+      const margins = generateMarginWithoutPrefix(0.1);
+      const zeroMargins = generateMarginWithoutPrefix(0);
       mockIsSkipAction.mockReturnValue(true);
 
       // Act
-      const oddsWithMargin = await generateOdds(margin, mockResult);
-      const oddsWithoutMargin = await generateOdds(0, mockResult);
+      const oddsWithMargin = await generateOdds(margins, mockResult);
+      const oddsWithoutMargin = await generateOdds(zeroMargins, mockResult);
 
       // Assert
       expect(oddsWithMargin.big).toBeCloseTo(
-        Math.floor((oddsWithoutMargin.big - margin) * 100) / 100,
+        Math.floor((oddsWithoutMargin.big - margins[BET_CHOICES.big]) * 100) /
+          100,
         2,
       );
       expect(oddsWithMargin.small).toBeCloseTo(
-        Math.floor((oddsWithoutMargin.small - margin) * 100) / 100,
+        Math.floor(
+          (oddsWithoutMargin.small - margins[BET_CHOICES.small]) * 100,
+        ) / 100,
         2,
       );
       expect(oddsWithMargin.odd).toBeCloseTo(
-        Math.floor((oddsWithoutMargin.odd - margin) * 100) / 100,
+        Math.floor((oddsWithoutMargin.odd - margins[BET_CHOICES.odd]) * 100) /
+          100,
         2,
       );
       expect(oddsWithMargin.even).toBeCloseTo(
-        Math.floor((oddsWithoutMargin.even - margin) * 100) / 100,
+        Math.floor((oddsWithoutMargin.even - margins[BET_CHOICES.even]) * 100) /
+          100,
         2,
       );
     });
 
     test("should handle zero margin", async () => {
       // Arrange
+      const margins = generateMarginWithoutPrefix(0);
       mockIsSkipAction.mockReturnValue(true);
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.big).toBeGreaterThan(0);
@@ -220,6 +235,7 @@ describe("generateOdds", () => {
   });
 
   describe("Action-based odds - Move/NoMove", () => {
+    const margins = generateMarginWithoutPrefix(0);
     test("should return 0 for move odds when no actions are available", async () => {
       // Arrange
       mockIsSkipAction.mockReturnValue(false); // All 36 combinations result in move
@@ -229,7 +245,7 @@ describe("generateOdds", () => {
       });
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.move).toBe(0);
@@ -244,7 +260,7 @@ describe("generateOdds", () => {
       });
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.noMove).toBe(0);
@@ -259,7 +275,7 @@ describe("generateOdds", () => {
       });
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       // 12 skips, 24 moves
@@ -269,12 +285,13 @@ describe("generateOdds", () => {
   });
 
   describe("Action-based odds - Release/NoRelease", () => {
+    const margins = generateMarginWithoutPrefix(0);
     test("should return 0 for release odds when all combinations are releases", async () => {
       // Arrange
       mockIsReleaseAction.mockReturnValue(true);
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.release).toBe(0);
@@ -285,7 +302,7 @@ describe("generateOdds", () => {
       mockIsReleaseAction.mockReturnValue(false); // No combinations are releases
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.noRelease).toBe(0);
@@ -300,7 +317,7 @@ describe("generateOdds", () => {
       });
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.release).toBeCloseTo(36 / 6, 2); // 6
@@ -309,12 +326,13 @@ describe("generateOdds", () => {
   });
 
   describe("Action-based odds - GoStable/NoStable", () => {
+    const margins = generateMarginWithoutPrefix(0);
     test("should return 0 for goStable odds when all combinations are go to stable", async () => {
       // Arrange
       mockIsGoToStableAction.mockReturnValue(true);
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.goStable).toBe(0);
@@ -325,7 +343,7 @@ describe("generateOdds", () => {
       mockIsGoToStableAction.mockReturnValue(false);
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.noStable).toBe(0);
@@ -340,7 +358,7 @@ describe("generateOdds", () => {
       });
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.goStable).toBeCloseTo(36 / 3, 2); // 12
@@ -349,12 +367,13 @@ describe("generateOdds", () => {
   });
 
   describe("Action-based odds - Kick/NoKick", () => {
+    const margins = generateMarginWithoutPrefix(0);
     test("should return 0 for kick odds when all combinations are kicks", async () => {
       // Arrange
       mockIsKickAction.mockReturnValue(true);
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.kick).toBe(0);
@@ -365,7 +384,7 @@ describe("generateOdds", () => {
       mockIsKickAction.mockReturnValue(false);
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.noKick).toBe(0);
@@ -380,7 +399,7 @@ describe("generateOdds", () => {
       });
 
       // Act
-      const odds = await generateOdds(0, mockResult);
+      const odds = await generateOdds(margins, mockResult);
 
       // Assert
       expect(odds.kick).toBeCloseTo(36 / 9, 2); // 4
@@ -391,7 +410,7 @@ describe("generateOdds", () => {
   describe("Integration with game state", () => {
     test("should iterate through all 36 dice combinations", async () => {
       // Act
-      await generateOdds(0.05, mockResult);
+      await generateOdds(mockMargins, mockResult);
 
       // Assert
       expect(DiceState).toHaveBeenCalledTimes(36);
@@ -399,7 +418,7 @@ describe("generateOdds", () => {
 
     test("should call getActions for each dice combination", async () => {
       // Act
-      await generateOdds(0.05, mockResult);
+      await generateOdds(mockMargins, mockResult);
 
       // Assert
       expect(mockGetActions).toHaveBeenCalledTimes(36);
@@ -407,7 +426,7 @@ describe("generateOdds", () => {
 
     test("should call ruleBotInstance.move for each dice combination", async () => {
       // Act
-      await generateOdds(0.05, mockResult);
+      await generateOdds(mockMargins, mockResult);
 
       // Assert
       expect(mockRuleBotMove).toHaveBeenCalledTimes(36);
@@ -424,7 +443,7 @@ describe("generateOdds", () => {
       ];
 
       // Act
-      await generateOdds(0, mockResult);
+      await generateOdds(generateMargins(0), mockResult);
 
       // Assert
       expect(mockGetActions).toHaveBeenCalledWith(
@@ -445,7 +464,7 @@ describe("generateOdds", () => {
       mockResult.board = customBoard;
 
       // Act
-      await generateOdds(0, mockResult);
+      await generateOdds(generateMargins(0), mockResult);
 
       // Assert
       expect(mockGetActions).toHaveBeenCalledWith(
@@ -466,7 +485,7 @@ describe("generateOdds", () => {
       mockResult.board = customBoard;
 
       // Act
-      await generateOdds(0, mockResult);
+      await generateOdds(generateMargins(0), mockResult);
 
       // Assert
       expect(mockGetRaceMap).toHaveBeenCalledWith(customBoard);
@@ -481,7 +500,7 @@ describe("generateOdds", () => {
       mockIsSkipAction.mockReturnValue(true);
 
       // Act
-      const odds = await generateOdds(0.05, mockResult);
+      const odds = await generateOdds(mockMargins, mockResult);
 
       // Assert
       expect(odds).toBeDefined();
@@ -507,7 +526,7 @@ describe("generateOdds", () => {
       mockIsKickAction.mockReturnValue(false);
 
       // Act
-      const odds = await generateOdds(0.05, mockResult);
+      const odds = await generateOdds(mockMargins, mockResult);
 
       // Assert
       expect(odds).toBeDefined();
@@ -525,7 +544,7 @@ describe("generateOdds", () => {
       mockIsSkipAction.mockReturnValue(false);
 
       // Act
-      const odds = await generateOdds(0.1, mockResult);
+      const odds = await generateOdds(generateMargins(0.1), mockResult);
 
       // Assert
       expect(odds).toBeDefined();
@@ -543,7 +562,7 @@ describe("generateOdds", () => {
       });
 
       // Act
-      await generateOdds(0, mockResult);
+      await generateOdds(generateMargins(0), mockResult);
 
       // Assert
       const firstDieValues = [...new Set(diceValues.map((d) => d[0]))];
@@ -559,7 +578,7 @@ describe("generateOdds", () => {
       });
 
       // Act
-      await generateOdds(0, mockResult);
+      await generateOdds(generateMargins(0), mockResult);
 
       // Assert
       const secondDieValues = [...new Set(diceValues.map((d) => d[1]))];
@@ -575,7 +594,7 @@ describe("generateOdds", () => {
       });
 
       // Act
-      await generateOdds(0, mockResult);
+      await generateOdds(generateMargins(0), mockResult);
 
       // Assert
       expect(diceValues).toHaveLength(36);

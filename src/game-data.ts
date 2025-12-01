@@ -2,13 +2,25 @@ import { PlayerColor } from "@rd/ludo-rules";
 import { Table } from "sc-game-base";
 import { IResult } from "./models/interfaces/result.js";
 import { Odds, RealPlayer } from "./types.js";
+import { MARGIN_KEYS } from "./constants.js";
 
 export default class GameData extends Table.TableGameData {
   declare gameConfigs: {
     gameId: number;
     enabled: boolean;
     odds: {
-      margin: number;
+      [MARGIN_KEYS.big]: number;
+      [MARGIN_KEYS.small]: number;
+      [MARGIN_KEYS.odd]: number;
+      [MARGIN_KEYS.even]: number;
+      [MARGIN_KEYS.kick]: number;
+      [MARGIN_KEYS.noKick]: number;
+      [MARGIN_KEYS.move]: number;
+      [MARGIN_KEYS.noMove]: number;
+      [MARGIN_KEYS.release]: number;
+      [MARGIN_KEYS.noRelease]: number;
+      [MARGIN_KEYS.goStable]: number;
+      [MARGIN_KEYS.noStable]: number;
     };
     originalOdds: Odds;
     enableFreeBet: boolean;
