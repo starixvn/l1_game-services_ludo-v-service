@@ -1,13 +1,13 @@
 import { RuleBot } from "@rd/ludo-rules";
 
 export const ruleBotInstance = new RuleBot({
-  homeStartPoints: 5,
+  homeStartPoints: 9,
   raceRacePoints: 2,
-  raceStablePoints: 6,
+  raceStablePoints: 5,
   stableStablePoints: 3,
-  otherStartingPositionPoints: 7,
+  otherStartingPositionPoints: 6,
   inStartingPositionPoints: 4,
-  kickOthersPoints: 8,
+  kickOthersPoints: 10,
   enterOthersStartingPositionPoints: -1,
   canKickOthersPoints: {
     1: 0,
