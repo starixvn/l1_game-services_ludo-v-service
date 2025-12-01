@@ -24,5 +24,4 @@ export interface ITempBet {
   operatorId: string;
   reachMaxWin: boolean;
   maxWin: number;
-  margin: number;
 }

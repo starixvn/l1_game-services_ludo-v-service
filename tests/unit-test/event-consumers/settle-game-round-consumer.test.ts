@@ -6,6 +6,7 @@ import { IBet } from "../../../src/models/interfaces/bet.js";
 import { IResult } from "../../../src/models/interfaces/result.js";
 import { IRound } from "../../../src/models/interfaces/round.js";
 import { ISettlementResult } from "../../../src/models/interfaces/settlement-result.js";
+import { generateMargins } from "../__mock__/margins.js";
 
 // Mock sc-game-base to avoid constructor issues
 jest.mock("sc-game-base", () => {
@@ -407,7 +408,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = { big: 1.95 };
 
@@ -462,7 +462,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = { big: 1.95, small: 2.35 };
 
@@ -520,7 +519,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = {
         big: 1.95,
@@ -584,7 +582,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = { big: 1.95 };
 
@@ -639,7 +636,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = { big: 1.95, odd: 1.95 };
 
@@ -692,7 +688,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = {}; // No odds provided
 
@@ -745,7 +740,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = { big: 1.95, odd: 1.95 };
 
@@ -808,7 +802,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = {
         big: 2.0,
@@ -896,6 +889,7 @@ describe("SettleGameRoundConsumer", () => {
         initRoundId: 5,
         time: new Date(),
         exchangeRateId: 1,
+        margin: generateMargins(0.05),
       };
       (mockDeps.roundsRepository.create as jest.Mock).mockResolvedValue(
         mockNewRound,
@@ -914,6 +908,7 @@ describe("SettleGameRoundConsumer", () => {
         initRoundId: 5,
         time: expect.any(Date),
         exchangeRateId: 1,
+        margin: generateMargins(0.05),
       });
     });
 
@@ -1243,7 +1238,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = {
         big: 1.95,
@@ -1308,7 +1302,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = { small: 2.35, even: 1.95 };
 
@@ -1361,7 +1354,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = { big: 1.95 };
 
@@ -1415,7 +1407,6 @@ describe("SettleGameRoundConsumer", () => {
         operatorId: "op1",
         reachMaxWin: false,
         maxWin: 10000,
-        margin: 0.05,
       };
       const odds = { big: 1.95 };
 
@@ -1456,6 +1447,9 @@ function createMockDependencies() {
     goStable: 5.0,
     noStable: 1.05,
   };
+  mockGameData.gameConfigs = {
+    odds: generateMargins(0.05),
+  } as any;
 
   const mockDefinition = {
     settle: jest.fn(),

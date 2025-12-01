@@ -208,30 +208,6 @@ describe("ProcessBetQueue", () => {
       expect(setOnInsertData.odds).toEqual(expectedOdds);
     });
 
-    test("should include margin from game configs in bet record", async () => {
-      // Arrange
-      const mockDeps = createMockDependencies();
-      const processBetQueue = new ProcessBetQueue(mockDeps);
-      const player = createMockPlayer();
-      const roundId = 12345;
-      const bet = {
-        betChoice: "move",
-        amount: 200,
-        clientSeed: "seed-789",
-      };
-      const rate = 1.0;
-      const expectedMargin = 0.05;
-      processBetQueue.gameData.gameConfigs.odds.margin = expectedMargin;
-
-      // Act
-      await processBetQueue.upsertBet(player, roundId, bet, rate, null);
-
-      // Assert
-      const callArgs = mockDeps.betsRepository.updateOne.mock.calls[0];
-      const setOnInsertData = callArgs[1].$setOnInsert;
-      expect(setOnInsertData.margin).toBe(expectedMargin);
-    });
-
     test("should set increment for bet amount on specific bet choice", async () => {
       // Arrange
       const mockDeps = createMockDependencies();

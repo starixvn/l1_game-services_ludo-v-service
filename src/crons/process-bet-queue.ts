@@ -13,7 +13,6 @@ export class ProcessBetQueue extends Table.Crons.TableProcessBetQueue {
     rate: number,
     applicableInterceptors: any,
   ) {
-    const configs = this.gameData.gameConfigs;
     const odds = this.gameData.odds;
     let newBet = {
       uid: player.UID,
@@ -22,7 +21,6 @@ export class ProcessBetQueue extends Table.Crons.TableProcessBetQueue {
       odds: odds,
       roundId,
       clientSeed: bet.clientSeed,
-      margin: configs.odds.margin,
     } as any;
 
     // Transform bet record with interceptors

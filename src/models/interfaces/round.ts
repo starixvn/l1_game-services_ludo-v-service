@@ -9,4 +9,5 @@ export interface IRound {
   time: Date;
   exchangeRateId: number;
   matchId: number;
+  margin: { [key: string]: number };
 }

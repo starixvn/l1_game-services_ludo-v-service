@@ -10,4 +10,5 @@ export const roundSchema = new mongoose.Schema<IRound>({
   time: { type: Date, required: true },
   exchangeRateId: { type: Number, required: true },
   initRoundId: { type: Number },
+  margin: { type: Object },
 });
