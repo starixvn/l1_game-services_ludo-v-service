@@ -6,5 +6,11 @@ export interface IBetLog {
   amount: number;
   clientSentTime: Date;
   receivedTime: Date;
+  siteId: string;
+  operatorId: string;
+  freeBet: boolean;
+  playerId: string;
+  currency: string;
+  rate: number;
   roundId: number;
 }

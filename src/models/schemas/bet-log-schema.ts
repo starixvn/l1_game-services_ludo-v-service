@@ -9,5 +9,11 @@ export const betLogSchema = new mongoose.Schema<IBetLog>({
   amount: { type: Number, required: true },
   clientSentTime: { type: Date },
   receivedTime: { type: Date, required: true },
+  siteId: { type: String },
+  operatorId: { type: String, required: true },
+  freeBet: { type: Boolean, default: false },
+  playerId: { type: String, required: true },
+  currency: { type: String, required: true },
+  rate: { type: Number, required: true },
   roundId: { type: Number, required: true },
 });
