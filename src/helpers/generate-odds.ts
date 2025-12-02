@@ -37,7 +37,7 @@ export const generateOdds = async (
     const count = oddCounts[key as keyof Odds];
     const result =
       count >= 2 && count <= 34
-        ? Math.floor((1 / (count / 36) - margins[key]) * 100) / 100
+        ? Math.floor((36 / count) * (1 - margins[key]) * 100) / 100
         : 0;
     acc[key as keyof Odds] = result;
     return acc;

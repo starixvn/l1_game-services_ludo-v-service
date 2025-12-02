@@ -36,10 +36,10 @@ import {
 import { BET_CHOICES, MARGIN_KEYS } from "../../../src/constants.js";
 import {
   generateMargins,
-  generateMarginWithoutPrefix,
+  generateMarginsWithoutPrefix,
 } from "../__mock__/margins.js";
 
-const mockMargins = generateMarginWithoutPrefix(0.05);
+const mockMargins = generateMarginsWithoutPrefix(0.05);
 
 describe("generateOdds", () => {
   let mockResult: IResult;
@@ -129,7 +129,7 @@ describe("generateOdds", () => {
   });
 
   describe("Dice probability calculations", () => {
-    const margins = generateMarginWithoutPrefix(0);
+    const margins = generateMarginsWithoutPrefix(0);
     test("should calculate big odds based on dice combinations > 6", async () => {
       // Arrange
       mockIsSkipAction.mockReturnValue(true);
@@ -186,8 +186,8 @@ describe("generateOdds", () => {
   describe("Margin application", () => {
     test("should apply margin reduction to all odds", async () => {
       // Arrange
-      const margins = generateMarginWithoutPrefix(0.1);
-      const zeroMargins = generateMarginWithoutPrefix(0);
+      const margins = generateMarginsWithoutPrefix(0.1);
+      const zeroMargins = generateMarginsWithoutPrefix(0);
       mockIsSkipAction.mockReturnValue(true);
 
       // Act
@@ -196,31 +196,26 @@ describe("generateOdds", () => {
 
       // Assert
       expect(oddsWithMargin.big).toBeCloseTo(
-        Math.floor((oddsWithoutMargin.big - margins[BET_CHOICES.big]) * 100) /
-          100,
+        oddsWithoutMargin.big * (1 - margins[BET_CHOICES.big]),
         2,
       );
       expect(oddsWithMargin.small).toBeCloseTo(
-        Math.floor(
-          (oddsWithoutMargin.small - margins[BET_CHOICES.small]) * 100,
-        ) / 100,
+        oddsWithoutMargin.small * (1 - margins[BET_CHOICES.small]),
         2,
       );
       expect(oddsWithMargin.odd).toBeCloseTo(
-        Math.floor((oddsWithoutMargin.odd - margins[BET_CHOICES.odd]) * 100) /
-          100,
+        oddsWithoutMargin.odd * (1 - margins[BET_CHOICES.odd]),
         2,
       );
       expect(oddsWithMargin.even).toBeCloseTo(
-        Math.floor((oddsWithoutMargin.even - margins[BET_CHOICES.even]) * 100) /
-          100,
+        oddsWithoutMargin.even * (1 - margins[BET_CHOICES.even]),
         2,
       );
     });
 
     test("should handle zero margin", async () => {
       // Arrange
-      const margins = generateMarginWithoutPrefix(0);
+      const margins = generateMarginsWithoutPrefix(0);
       mockIsSkipAction.mockReturnValue(true);
 
       // Act
@@ -235,7 +230,7 @@ describe("generateOdds", () => {
   });
 
   describe("Action-based odds - Move/NoMove", () => {
-    const margins = generateMarginWithoutPrefix(0);
+    const margins = generateMarginsWithoutPrefix(0);
     test("should return 0 for move odds when no actions are available", async () => {
       // Arrange
       mockIsSkipAction.mockReturnValue(false); // All 36 combinations result in move
@@ -285,7 +280,7 @@ describe("generateOdds", () => {
   });
 
   describe("Action-based odds - Release/NoRelease", () => {
-    const margins = generateMarginWithoutPrefix(0);
+    const margins = generateMarginsWithoutPrefix(0);
     test("should return 0 for release odds when all combinations are releases", async () => {
       // Arrange
       mockIsReleaseAction.mockReturnValue(true);
@@ -326,7 +321,7 @@ describe("generateOdds", () => {
   });
 
   describe("Action-based odds - GoStable/NoStable", () => {
-    const margins = generateMarginWithoutPrefix(0);
+    const margins = generateMarginsWithoutPrefix(0);
     test("should return 0 for goStable odds when all combinations are go to stable", async () => {
       // Arrange
       mockIsGoToStableAction.mockReturnValue(true);
@@ -367,7 +362,7 @@ describe("generateOdds", () => {
   });
 
   describe("Action-based odds - Kick/NoKick", () => {
-    const margins = generateMarginWithoutPrefix(0);
+    const margins = generateMarginsWithoutPrefix(0);
     test("should return 0 for kick odds when all combinations are kicks", async () => {
       // Arrange
       mockIsKickAction.mockReturnValue(true);

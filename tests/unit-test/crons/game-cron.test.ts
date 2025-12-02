@@ -3,7 +3,7 @@ import { GameCron } from "../../../src/crons/game-cron.js";
 import GameData from "../../../src/game-data.js";
 import {
   generateMargins,
-  generateMarginWithoutPrefix,
+  generateMarginsWithoutPrefix,
 } from "../__mock__/margins.js";
 
 // Mock sc-game-base to avoid constructor issues
@@ -388,7 +388,7 @@ describe("GameCron", () => {
 
       // Assert
       expect(mockDeps.definition.generateOdds).toHaveBeenCalledWith(
-        generateMarginWithoutPrefix(0.05),
+        generateMarginsWithoutPrefix(0.05),
         result,
       );
       expect(mockDeps.definition.generateOdds).toHaveBeenCalledTimes(1);
@@ -440,7 +440,7 @@ describe("GameCron", () => {
 
       // Assert
       expect(mockDeps.definition.generateOdds).toHaveBeenCalledWith(
-        generateMarginWithoutPrefix(0.08),
+        generateMarginsWithoutPrefix(0.08),
         expect.any(Object),
       );
     });

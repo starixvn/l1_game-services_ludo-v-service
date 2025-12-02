@@ -8,6 +8,8 @@ import { generateDice } from "../../src/helpers/index.js";
 import { IResult } from "../../src/models/interfaces/result.js";
 import { ISettlementResult } from "../../src/models/interfaces/settlement-result";
 import { Odds } from "../../src/types.js";
+import { generateMarginsWithoutPrefix } from "../unit-test/__mock__/margins.js";
+import { securePickOne } from "sc-core-rng";
 
 const BETTING_CHOICES = {
   dice: ["big", "small", "odd", "even"] as const,
@@ -46,6 +48,8 @@ const BETTING_STRATEGIES = [
   "action-only",
   "one-side",
   "random-side",
+  "small-odds",
+  "random-small-odds",
 ] as const;
 
 type BettingStrategy = (typeof BETTING_STRATEGIES)[number];
@@ -215,10 +219,12 @@ const getBets = (
 ): Partial<Record<OddsKey, number>> => {
   const bets: Partial<Record<OddsKey, number>> = {};
 
-  const addBetIfAvailable = (key: string): void => {
+  const addBetIfAvailable = (key: string): boolean => {
     if (odds[key as OddsKey] !== 0) {
       bets[key as OddsKey] = config.betAmount;
+      return true;
     }
+    return false;
   };
 
   switch (config.bettingStrategy) {
@@ -245,15 +251,39 @@ const getBets = (
     }
 
     case "dice-only":
-      BETTING_CHOICES.dice.forEach(addBetIfAvailable);
+      const bet = securePickOne([...BETTING_CHOICES.dice]);
+      addBetIfAvailable(bet);
       break;
 
     case "action-only":
-      BETTING_CHOICES.actions.forEach(addBetIfAvailable);
+      const action = securePickOne([...BETTING_CHOICES.actions]);
+      addBetIfAvailable(action);
       break;
 
     case "one-side":
       BETTING_CHOICES.oneSide.forEach(addBetIfAvailable);
+      break;
+
+    case "small-odds":
+      for (const [choice1, choice2] of BETTING_CHOICES.pairs) {
+        if (odds[choice1 as OddsKey] < odds[choice2 as OddsKey]) {
+          addBetIfAvailable(choice1);
+        } else {
+          addBetIfAvailable(choice2);
+        }
+      }
+      break;
+
+    case "random-small-odds":
+      let added = false;
+      while (!added) {
+        const [choice1, choice2] = securePickOne([...BETTING_CHOICES.pairs]);
+        if (odds[choice1 as OddsKey] < odds[choice2 as OddsKey]) {
+          added = addBetIfAvailable(choice1);
+        } else {
+          added = addBetIfAvailable(choice2);
+        }
+      }
       break;
 
     case "random-side":
@@ -288,7 +318,10 @@ const runSimulation = async (
       dice: [],
     };
 
-    const odds = await generateOdds(config.margin, preRoundResult);
+    const odds = await generateOdds(
+      generateMarginsWithoutPrefix(config.margin),
+      preRoundResult,
+    );
     const bets = getBets(config, odds);
     const dice = generateDice();
     gameData.dice = dice;

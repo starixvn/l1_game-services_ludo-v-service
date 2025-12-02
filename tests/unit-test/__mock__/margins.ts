@@ -17,7 +17,7 @@ export const generateMargins = (margin: number) => {
   };
 };
 
-export const generateMarginWithoutPrefix = (margin: number) => {
+export const generateMarginsWithoutPrefix = (margin: number) => {
   return {
     [BET_CHOICES.big]: margin,
     [BET_CHOICES.small]: margin,

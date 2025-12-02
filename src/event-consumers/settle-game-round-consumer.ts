@@ -75,6 +75,7 @@ export class SettleGameRoundConsumer extends Table.EventConsumers
         board: convertBoardState(result.board),
         dice1: result.dice[0],
         dice2: result.dice[1],
+        winner: result.winners.length > 0 ? result.winners[0] : undefined,
         action: {
           ...result.action,
           player: result.action.playerColor,
