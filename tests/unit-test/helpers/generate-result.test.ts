@@ -278,6 +278,56 @@ describe("generateResult", () => {
       const moveFunction = mockUpdateGameState.mock.calls[0][4];
       expect(typeof moveFunction).toBe("function");
     });
+
+    test("should call ruleBotInstance.move when callback is invoked", async () => {
+      // Arrange
+      mockSecureRandomRange.mockReturnValue(3);
+      const mockMoveInput = {
+        boardState: {
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        raceMap: {},
+        playerColor: PlayerColor.RED,
+        diceState: { dice: [3, 3] },
+        possibleActions: [],
+      };
+
+      const data: GenerateResultData = {
+        currentBoardState: mockMoveInput.boardState,
+        currentPlayers: [PlayerColor.RED],
+        currentTurnIndex: 0,
+        winners: [],
+        dice: [1, 2],
+      };
+
+      // Mock updateGameState to call the callback function
+      mockUpdateGameState.mockImplementation(async (board, players, turnIndex, dice, moveCallback) => {
+        // Call the callback to test line 38
+        await moveCallback(mockMoveInput);
+        return {
+          gameState: {
+            board: data.currentBoardState,
+            currentPlayer: PlayerColor.RED,
+            playerAction: { type: "skip", oldPosition: 0, newPosition: 0 },
+            winners: [],
+          },
+          nextTurn: 0,
+        } as any;
+      });
+
+      mockRuleBotMove.mockResolvedValue({ oldPosition: 0, newPosition: 0 } as any);
+
+      // Act
+      await generateResult(data);
+
+      // Assert
+      expect(mockUpdateGameState).toHaveBeenCalled();
+      expect(mockRuleBotMove).toHaveBeenCalledWith(mockMoveInput);
+      expect(mockRuleBotMove).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("Result structure", () => {

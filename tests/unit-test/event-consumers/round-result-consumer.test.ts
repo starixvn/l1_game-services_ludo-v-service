@@ -1186,6 +1186,156 @@ describe("RoundResultConsumer", () => {
       expect(consumer.gameData.result.nextTurnIndex).toBe(0);
     });
   });
+
+  describe("resultFromAdmin", () => {
+    test("should return settlement result when roundId matches", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new RoundResultConsumer(
+        mockDeps.gameData,
+        mockDeps.definition,
+        mockDeps.roundResultPublisher,
+        mockDeps.resultsRepository,
+        mockDeps.provablyFairConsumer,
+      );
+      consumer.gameData.roundId = 5;
+      consumer.gameData.settlementResultFromAdmin = {
+        roundId: 5,
+        result: {
+          dice: [6, 6],
+        },
+      };
+
+      // Act
+      const result = consumer.resultFromAdmin();
+
+      // Assert
+      expect(result).toEqual({
+        dice: [6, 6],
+      });
+    });
+
+    test("should return empty object when roundId does not match", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new RoundResultConsumer(
+        mockDeps.gameData,
+        mockDeps.definition,
+        mockDeps.roundResultPublisher,
+        mockDeps.resultsRepository,
+        mockDeps.provablyFairConsumer,
+      );
+      consumer.gameData.roundId = 5;
+      consumer.gameData.settlementResultFromAdmin = {
+        roundId: 10,
+        result: {
+          dice: [6, 6],
+        },
+      };
+
+      // Act
+      const result = consumer.resultFromAdmin();
+
+      // Assert
+      expect(result).toEqual({});
+    });
+
+    test("should return empty object when settlementResultFromAdmin is undefined", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new RoundResultConsumer(
+        mockDeps.gameData,
+        mockDeps.definition,
+        mockDeps.roundResultPublisher,
+        mockDeps.resultsRepository,
+        mockDeps.provablyFairConsumer,
+      );
+      consumer.gameData.roundId = 5;
+      consumer.gameData.settlementResultFromAdmin = undefined as any;
+
+      // Act
+      const result = consumer.resultFromAdmin();
+
+      // Assert
+      expect(result).toEqual({});
+    });
+
+    test("should merge settlement result with getDataForGenerateResult in generateResult", async () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new RoundResultConsumer(
+        mockDeps.gameData,
+        mockDeps.definition,
+        mockDeps.roundResultPublisher,
+        mockDeps.resultsRepository,
+        mockDeps.provablyFairConsumer,
+      );
+      consumer.gameData.roundId = 5;
+      consumer.gameData.settlementResultFromAdmin = {
+        roundId: 5,
+        result: {
+          dice: [6, 6],
+        },
+      };
+      consumer.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [],
+        action: {
+          oldPosition: 0,
+          newPosition: 0,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      const mockResult: IResult = {
+        board: {
+          [PlayerColor.RED]: [7, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 1,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [6, 6],
+        action: {
+          oldPosition: 0,
+          newPosition: 7,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      (mockDeps.definition.generateResult as jest.Mock).mockResolvedValue(
+        mockResult,
+      );
+
+      // Act
+      await consumer.generateResult();
+
+      // Assert
+      expect(mockDeps.definition.generateResult).toHaveBeenCalledWith(
+        expect.objectContaining({
+          dice: [6, 6], // Should use dice from settlementResultFromAdmin
+        }),
+      );
+    });
+  });
 });
 
 // Helper function to create mock dependencies

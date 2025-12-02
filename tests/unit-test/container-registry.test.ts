@@ -37,6 +37,10 @@ jest.mock("sc-game-base", () => {
         registerCrons(): void {
           // Base implementation
         }
+
+        registerPublishers(): void {
+          // Base implementation
+        }
       },
     },
   };
@@ -461,6 +465,38 @@ describe("ContainerRegistry", () => {
 
       // Assert
       expect(cron1).toBe(cron2);
+    });
+  });
+
+  describe("registerPublishers", () => {
+    test("should call parent registerPublishers", () => {
+      // Arrange
+      const registry = new ContainerRegistry();
+      const superRegisterPublishers = jest.spyOn(
+        Object.getPrototypeOf(ContainerRegistry.prototype),
+        "registerPublishers",
+      );
+
+      // Act
+      registry.registerPublishers();
+
+      // Assert
+      expect(superRegisterPublishers).toHaveBeenCalledTimes(1);
+
+      superRegisterPublishers.mockRestore();
+    });
+
+    test("should register runningRoundInfoPublisher with RunningRoundInfoPublisher class", () => {
+      // Arrange
+      const registry = new ContainerRegistry();
+
+      // Act
+      registry.registerPublishers();
+
+      // Assert
+      expect(
+        registry.container.hasRegistration("runningRoundInfoPublisher"),
+      ).toBe(true);
     });
   });
 

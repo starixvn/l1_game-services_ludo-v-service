@@ -12,6 +12,7 @@ jest.mock("sc-game-base", () => {
     getUserInfo = jest.fn();
     buildPlayersPayload = jest.fn();
     trackUserSignIn = jest.fn();
+    consume = jest.fn();
   };
 
   return {
@@ -32,8 +33,21 @@ jest.mock("sc-game-base", () => {
         }
       },
     },
+    Systems: {
+      Mobi: 1,
+      Mini: 2,
+      Web: 3,
+    },
   };
 });
+
+jest.mock("sc-game-base/dist/constants/systems.js", () => ({
+  Systems: {
+    Mobi: 1,
+    Mini: 2,
+    Web: 3,
+  },
+}));
 
 // Mock dependencies
 jest.mock("../../../src/helpers/rule-bot-instance.js", () => ({
@@ -408,6 +422,171 @@ describe("InGameConsumer", () => {
 
       // Assert
       expect(payload.ownBets).toEqual({});
+    });
+
+    test("should return empty players object when system is Mobi", async () => {
+      // Arrange
+      const { Systems } = await import("sc-game-base/dist/constants/systems.js");
+      mockRealPlayer.session.system = Systems.Mobi;
+      consumer.buildPlayersPayload = jest.fn().mockReturnValue({ player1: {} });
+
+      // Act
+      const payload = await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(payload.players).toEqual({});
+      expect(consumer.buildPlayersPayload).not.toHaveBeenCalled();
+    });
+
+    test("should return payload without remainingTime when disabled and system is Mini", async () => {
+      // Arrange
+      const { Systems } = await import("sc-game-base/dist/constants/systems.js");
+      mockGameData.gameConfigs = {
+        gameId: 1,
+        enabled: false,
+        odds: { margin: 0.05 },
+        originalOdds: {} as any,
+        enableFreeBet: false,
+        boostedChoices: false,
+      };
+      mockRealPlayer.session.system = Systems.Mini;
+      consumer.buildPlayersPayload = jest.fn().mockReturnValue({ player1: {} });
+
+      // Act
+      const payload = await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(payload.remainingTime).toBeUndefined();
+      expect(payload.players).toBeDefined();
+      expect(payload.chips).toBeDefined();
+    });
+
+    test("should return payload with remainingTime when not disabled or system is not Mini", async () => {
+      // Arrange
+      const { Systems } = await import("sc-game-base/dist/constants/systems.js");
+      mockRealPlayer.session.system = Systems.Web;
+      consumer.buildPlayersPayload = jest.fn().mockReturnValue({ player1: {} });
+
+      // Act
+      const payload = await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(payload.remainingTime).toBe(25000);
+      expect(payload.players).toBeDefined();
+      expect(payload.chips).toBeDefined();
+    });
+
+    test("should return payload with remainingTime when disabled but system is not Mini", async () => {
+      // Arrange
+      const { Systems } = await import("sc-game-base/dist/constants/systems.js");
+      mockGameData.gameConfigs = {
+        gameId: 1,
+        enabled: false,
+        odds: { margin: 0.05 },
+        originalOdds: {} as any,
+        enableFreeBet: false,
+        boostedChoices: false,
+      };
+      mockRealPlayer.session.system = Systems.Web;
+      consumer.buildPlayersPayload = jest.fn().mockReturnValue({ player1: {} });
+
+      // Act
+      const payload = await consumer.buildPayload(mockRealPlayer);
+
+      // Assert
+      expect(payload.remainingTime).toBe(25000);
+      expect(payload.players).toBeDefined();
+      expect(payload.chips).toBeDefined();
+    });
+  });
+
+  describe("consume", () => {
+    let consumer: InGameConsumer;
+    let mockGameData: GameData;
+
+    beforeEach(async () => {
+      consumer = Object.create(InGameConsumer.prototype);
+      const { Table } = await import("sc-game-base");
+      const mockBaseInstance = new Table.EventConsumers.TableInGameConsumer();
+      Object.setPrototypeOf(Object.getPrototypeOf(consumer), mockBaseInstance);
+
+      mockGameData = new GameData(30000);
+      mockGameData.gameConfigs = {
+        gameId: 1,
+        enabled: true,
+        odds: { margin: 0.05 },
+        originalOdds: {} as any,
+        enableFreeBet: false,
+        boostedChoices: false,
+      };
+    });
+    test("should set sendedInGame to true when player is in ingame", async () => {
+      // Arrange
+      const mockRealPlayer = {
+        profile: { name: "testPlayer" },
+        socketClient: { id: "socket123" },
+      } as any;
+      consumer.gameData = mockGameData;
+      mockGameData.realPlayers = {
+        [mockRealPlayer.socketClient.id]: {},
+      } as any;
+
+      // Act
+      await consumer.consume(mockRealPlayer);
+
+      // Assert
+      expect(
+        mockGameData.realPlayers[mockRealPlayer.socketClient.id].sendedInGame,
+      ).toBe(true);
+    });
+
+    test("should not set sendedInGame to true when game is disabled", async () => {
+      // Arrange
+      const mockRealPlayer = {
+        profile: { name: "testPlayer" },
+        socketClient: { id: "socket123" },
+      } as any;
+      mockGameData.gameConfigs = {
+        gameId: 1,
+        enabled: false,
+        odds: {} as any,
+        originalOdds: {} as any,
+        enableFreeBet: false,
+        boostedChoices: false,
+      };
+      consumer.gameData = mockGameData;
+      mockGameData.realPlayers = {
+        [mockRealPlayer.socketClient.id]: {},
+      } as any;
+
+      // Act
+      await consumer.consume(mockRealPlayer);
+
+      // Assert
+      expect(
+        mockGameData.realPlayers[mockRealPlayer.socketClient.id].sendedInGame,
+      ).toBe(undefined);
+    });
+
+    test("should not set sendedInGame to true when game configs is not defined", async () => {
+      // Arrange
+      const mockRealPlayer = {
+        profile: { name: "testPlayer" },
+        socketClient: { id: "socket123" },
+      } as any;
+      mockGameData.gameConfigs = undefined as any;
+      consumer.gameData = mockGameData;
+      mockGameData.realPlayers = {
+        [mockRealPlayer.socketClient.id]: {},
+      } as any;
+
+      // Act
+      await consumer.consume(mockRealPlayer);
+
+      // Assert
+      expect(
+        mockGameData.realPlayers[mockRealPlayer.socketClient.id].sendedInGame,
+      ).toBe(undefined);
     });
   });
 });
