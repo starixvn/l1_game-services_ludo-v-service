@@ -110,7 +110,10 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
     return {
       board: convertBoardState(this.gameData.result.board),
       currentTurnCount: this.gameData.roundId - this.gameData.initRoundId,
-      nextPlayer,
+      nextPlayer:
+        this.gameData.remainingTime > this.definition.durations.placingBets
+          ? this.gameData.result.action.playerColor
+          : nextPlayer,
       possibleActions,
     };
   }

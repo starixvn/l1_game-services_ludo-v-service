@@ -147,6 +147,7 @@ describe("InGameConsumer", () => {
       mockGameData.roundId = 5;
       mockGameData.initRoundId = 1;
       consumer.gameData = mockGameData;
+      consumer.definition = { durations: { placingBets: 17 } } as any;
     });
 
     test("should generate round data with board state and current turn count", async () => {
@@ -182,7 +183,20 @@ describe("InGameConsumer", () => {
 
     test("should calculate next player color for different turn indices", async () => {
       // Arrange
+      mockGameData.remainingTime = 16;
       mockGameData.result.nextTurnIndex = 2;
+
+      // Act
+      const roundData = await consumer.generateGameState();
+
+      // Assert
+      expect(roundData.nextPlayer).toBe(PlayerColor.YELLOW);
+    });
+
+    test("should calculate return next player color when remaining time is less than placing bets duration", async () => {
+      // Arrange
+      mockGameData.remainingTime = 28;
+      mockGameData.result.action.playerColor = PlayerColor.YELLOW;
 
       // Act
       const roundData = await consumer.generateGameState();
