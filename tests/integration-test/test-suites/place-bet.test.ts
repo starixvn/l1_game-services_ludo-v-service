@@ -7,20 +7,12 @@ import {
 import appConfigs from "../../../src/app-configs.IGT.js";
 import gameSettings from "../_stubs/game-settings.js";
 import { socketOptionsFunc } from "../_stubs/test-data.js";
-import { initUserSession } from "../helper/helper.js";
+import {
+  getTimeOutToPlacingBetTime,
+  initUserSession,
+} from "../helper/helper.js";
 
 const socketOptions = socketOptionsFunc(appConfigs.hostingPort);
-
-function getTimeOutToPlacingBetTime(remainingTime, durations) {
-  let timeout = 0;
-  if (remainingTime <= durations.lockingBet) {
-    timeout = remainingTime + durations.wholeRound - durations.placingBets + 2;
-  } else if (remainingTime >= durations.placingBets) {
-    timeout = remainingTime - durations.placingBets + 1;
-  }
-
-  return timeout;
-}
 
 describe("place bet", () => {
   let client;

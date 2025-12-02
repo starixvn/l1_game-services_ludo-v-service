@@ -39,3 +39,17 @@ export function buildResult(data) {
     data,
   };
 }
+
+export function getTimeOutToPlacingBetTime(
+  remainingTime: number,
+  durations: any,
+) {
+  let timeout = 0;
+  if (remainingTime <= durations.lockingBet) {
+    timeout = remainingTime + durations.wholeRound - durations.placingBets + 2;
+  } else if (remainingTime >= durations.placingBets) {
+    timeout = remainingTime - durations.placingBets + 1;
+  }
+
+  return timeout;
+}

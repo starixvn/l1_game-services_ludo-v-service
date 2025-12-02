@@ -15,6 +15,12 @@ export const socketOptionsFunc = (port) => ({
   proxyRoute: "/socket.io",
 });
 
+export const adminSocketOptionsFunc = (port) => ({
+  socketUri: `http://localhost:${port}/admin/${gameSetting.name.toLowerCase()}`,
+  gameName: game.name,
+  proxyRoute: "/socket.io",
+});
+
 export const gameConfig = {
   type: 0,
   name: gameSetting.name.toLowerCase(),

@@ -44,4 +44,7 @@ export default {
   userServiceSettings: {
     url: "https://l1-proxy.lumigame.com/user-service-igt-test",
   },
+  sentry: {
+    env: "TEST",
+  },
 };

@@ -23,6 +23,7 @@ const createMockUserInfo = (
   name: playerName,
   UID: playerId,
   red: 20000,
+
   avatarId: 1,
   currency: "$US",
   minBet: 1,
@@ -33,7 +34,10 @@ const createMockUserInfo = (
   banned: false,
 });
 
-const createMockUserSession = (playerId: string, playerName: string) => ({
+export const createMockUserSession = (
+  playerId: string,
+  playerName: string,
+) => ({
   ssoToken: `${playerId}-sso-token`,
   sessionId: `${playerId}-session-id`,
   siteId: "111",
@@ -64,6 +68,7 @@ const createMockUserSession = (playerId: string, playerName: string) => ({
 // Define test users
 export const normalUser = { playerId: "1", playerName: "NormalUser" };
 export const errorUser = { playerId: "2", playerName: "ErrorUser" };
+
 export const internalServerErrorUser = {
   playerId: "3",
   playerName: "InternalServerErrorUser",
@@ -72,12 +77,14 @@ export const endGameErrorUser = {
   playerId: "4",
   playerName: "EndGameErrorUser",
 };
+export const winnerUser = { playerId: "5", playerName: "WinnerUser" };
 
 const testUsers = [
   normalUser,
   errorUser,
   internalServerErrorUser,
   endGameErrorUser,
+  winnerUser,
 ];
 
 // Mock data for various services
@@ -397,6 +404,55 @@ export const stubPromotionServiceWithMockData = (gameId: number) => {
     .reply(200, []);
 };
 
+export const stubSGApiForUser = (
+  apiUrl: string,
+  user: { playerId: string },
+) => {
+  const actions = {
+    getBetLimit: "/Player/GetBetLimit",
+    getBalance: "/Player/Balance",
+    placeBet: "/Player/PlaceBet",
+    endGame: "/Player/EndGame",
+  };
+  const successResult = { errorCode: 0, errorDescription: "Success" };
+  const normalUserRequestBody = { PlayerId: user.playerId };
+  nock(apiUrl)
+    .persist()
+    .post(actions.getBetLimit, matches(normalUserRequestBody) as any)
+    .reply(200, {
+      result: {
+        ...successResult,
+        minBet: 0.01,
+        maxBet: 3000,
+      },
+    })
+    .post(actions.getBalance, matches(normalUserRequestBody) as any)
+    .reply(200, {
+      result: {
+        ...successResult,
+        balance: 25000,
+      },
+    })
+    .post(actions.placeBet, matches(normalUserRequestBody) as any)
+    .reply(200, {
+      result: {
+        balance: 24250,
+        ...successResult,
+        obTransId: 1763178465,
+        minBet: 1,
+        maxBet: 2000,
+        playerId: user.playerId,
+      },
+    })
+    .post(actions.endGame, matches(normalUserRequestBody) as any)
+    .reply(200, {
+      result: {
+        playerId: user.playerId,
+        ...successResult,
+      },
+    });
+};
+
 /**
  * Initialize all API stubs with mock data - no database required
  */
@@ -404,6 +460,7 @@ export const initAllStubsWithMockData = (definition) => {
   // Initialize nock
   nock(appConfigs.apiSettings.apiUrl);
   initAPIStub(appConfigs.apiSettings.apiUrl);
+  stubSGApiForUser(appConfigs.apiSettings.apiUrl, winnerUser);
 
   // Stub all services
   stubGameManagementServiceWithMockData(definition);

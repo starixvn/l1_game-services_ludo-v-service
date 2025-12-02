@@ -11,6 +11,8 @@ import {
 } from "../../../src/helpers/index.js";
 import { initAllStubsWithMockData } from "../_stubs/apis/game-management-service-stub.js";
 import gameSettings from "../_stubs/game-settings.js";
+import { AdminAuthenticationConsumer } from "./admin-authentication-consumer.js";
+import { asClass } from "awilix";
 
 export const run = async () => {
   const definition = new GameDefinition(
@@ -32,6 +34,11 @@ export const run = async () => {
   );
   const app = new Core.BaseGameApp("ludo", appConfigs);
   await app.run();
+  container.register({
+    adminAuthenticationConsumer: asClass(
+      AdminAuthenticationConsumer,
+    ).singleton(),
+  });
   await app.startGame(container);
 };
 
