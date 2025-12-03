@@ -35,6 +35,13 @@ export const generateOdds = async (
 
   return ODDS_KEYS.reduce((acc, key) => {
     const count = oddCounts[key as keyof Odds];
+    const margin = margins[key];
+
+    if (margin === undefined || Number.isNaN(margin)) {
+      acc[key as keyof Odds] = 0;
+      return acc;
+    }
+
     const result =
       count >= 2 && count <= 34
         ? Math.floor((36 / count) * (1 - margins[key]) * 100) / 100

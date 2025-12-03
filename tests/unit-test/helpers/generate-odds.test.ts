@@ -488,6 +488,119 @@ describe("generateOdds", () => {
     });
   });
 
+  describe("NaN margin handling", () => {
+    test("should return 0 when margin value is undefined", async () => {
+      // Arrange
+      const marginsWithUndefined = {
+        ...generateMarginsWithoutPrefix(0.05),
+        [BET_CHOICES.big]: undefined,
+        [BET_CHOICES.odd]: undefined,
+      } as unknown as { [key: string]: number };
+      mockIsSkipAction.mockReturnValue(true);
+
+      // Act
+      const odds = await generateOdds(marginsWithUndefined, mockResult);
+
+      // Assert
+      expect(odds.big).toBe(0);
+      expect(odds.odd).toBe(0);
+      expect(Number.isNaN(odds.big)).toBe(false);
+      expect(Number.isNaN(odds.odd)).toBe(false);
+    });
+
+    test("should return 0 when margin value is NaN", async () => {
+      // Arrange
+      const marginsWithNaN = {
+        ...generateMarginsWithoutPrefix(0.05),
+        [BET_CHOICES.small]: NaN,
+        [BET_CHOICES.even]: NaN,
+      };
+      mockIsSkipAction.mockReturnValue(true);
+
+      // Act
+      const odds = await generateOdds(marginsWithNaN, mockResult);
+
+      // Assert
+      expect(odds.small).toBe(0);
+      expect(odds.even).toBe(0);
+      expect(Number.isNaN(odds.small)).toBe(false);
+      expect(Number.isNaN(odds.even)).toBe(false);
+    });
+
+    test("should handle all margins being undefined", async () => {
+      // Arrange
+      const emptyMargins = {} as { [key: string]: number };
+      mockIsSkipAction.mockReturnValue(true);
+
+      // Act
+      const odds = await generateOdds(emptyMargins, mockResult);
+
+      // Assert
+      expect(Object.values(odds).every((v) => !Number.isNaN(v))).toBe(true);
+      expect(Object.values(odds).every((v) => v === 0)).toBe(true);
+    });
+
+    test("should handle all margins being NaN", async () => {
+      // Arrange
+      const nanMargins = {
+        [BET_CHOICES.big]: NaN,
+        [BET_CHOICES.small]: NaN,
+        [BET_CHOICES.odd]: NaN,
+        [BET_CHOICES.even]: NaN,
+        [BET_CHOICES.kick]: NaN,
+        [BET_CHOICES.noKick]: NaN,
+        [BET_CHOICES.move]: NaN,
+        [BET_CHOICES.noMove]: NaN,
+        [BET_CHOICES.release]: NaN,
+        [BET_CHOICES.noRelease]: NaN,
+        [BET_CHOICES.goStable]: NaN,
+        [BET_CHOICES.noStable]: NaN,
+      };
+      mockIsSkipAction.mockReturnValue(true);
+
+      // Act
+      const odds = await generateOdds(nanMargins, mockResult);
+
+      // Assert
+      expect(Object.values(odds).every((v) => !Number.isNaN(v))).toBe(true);
+      expect(Object.values(odds).every((v) => v === 0)).toBe(true);
+    });
+
+    test("should calculate valid odds for keys with valid margins when other keys have invalid margins", async () => {
+      // Arrange
+      const mixedMargins = {
+        [BET_CHOICES.big]: 0,
+        [BET_CHOICES.small]: 0,
+        [BET_CHOICES.odd]: NaN,
+        [BET_CHOICES.even]: undefined,
+        [BET_CHOICES.kick]: 0,
+        [BET_CHOICES.noKick]: 0,
+        [BET_CHOICES.move]: NaN,
+        [BET_CHOICES.noMove]: 0,
+        [BET_CHOICES.release]: 0,
+        [BET_CHOICES.noRelease]: 0,
+        [BET_CHOICES.goStable]: 0,
+        [BET_CHOICES.noStable]: 0,
+      } as unknown as { [key: string]: number };
+      mockIsSkipAction.mockReturnValue(true);
+
+      // Act
+      const odds = await generateOdds(mixedMargins, mockResult);
+
+      // Assert
+      // Valid margins should produce valid odds
+      expect(odds.big).toBeGreaterThan(0);
+      expect(odds.small).toBeGreaterThan(0);
+      // Invalid margins should return 0, not NaN
+      expect(odds.odd).toBe(0);
+      expect(odds.even).toBe(0);
+      expect(odds.move).toBe(0);
+      expect(Number.isNaN(odds.odd)).toBe(false);
+      expect(Number.isNaN(odds.even)).toBe(false);
+      expect(Number.isNaN(odds.move)).toBe(false);
+    });
+  });
+
   describe("Edge cases", () => {
     test("should handle result with different turn indices", async () => {
       // Arrange

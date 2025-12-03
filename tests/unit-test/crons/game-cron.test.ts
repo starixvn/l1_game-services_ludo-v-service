@@ -215,12 +215,6 @@ describe("GameCron", () => {
       gameCron.checkPromotionReadiness = jest.fn().mockImplementation(() => {
         callOrder.push("checkPromotionReadiness");
       });
-      mockDeps.promotionFreeSpinsConsumer.loadPromotionsRunning.mockImplementation(
-        () => {
-          callOrder.push("loadPromotionsRunning");
-          return Promise.resolve();
-        },
-      );
       mockDeps.unsettledRoundConsumer.proceed.mockImplementation(() => {
         callOrder.push("unsettledRoundConsumer.proceed");
         return Promise.resolve();
@@ -239,7 +233,6 @@ describe("GameCron", () => {
         "getSettingForNewRound",
         "updateExchangeRates",
         "checkPromotionReadiness",
-        "loadPromotionsRunning",
         "unsettledRoundConsumer.proceed",
         "startCron",
       ]);
@@ -306,20 +299,6 @@ describe("GameCron", () => {
 
       // Assert
       expect(gameCron.checkPromotionReadiness).toHaveBeenCalledTimes(1);
-    });
-
-    test("should call promotionFreeSpinsConsumer.loadPromotionsRunning", async () => {
-      // Arrange
-      const mockDeps = createMockDependencies();
-      const gameCron = new GameCron(mockDeps);
-
-      // Act
-      await gameCron.start();
-
-      // Assert
-      expect(
-        mockDeps.promotionFreeSpinsConsumer.loadPromotionsRunning,
-      ).toHaveBeenCalledTimes(1);
     });
 
     test("should call unsettledRoundConsumer.proceed", async () => {
@@ -640,9 +619,6 @@ describe("GameCron", () => {
       expect(
         mockDeps.settleGameRoundConsumer.settleRound,
       ).toHaveBeenCalledTimes(1);
-      expect(
-        mockDeps.promotionFreeSpinsConsumer.loadPromotionsRunning,
-      ).toHaveBeenCalledTimes(1);
       expect(gameCron.gameData.settlementResultFromAdmin).toEqual({});
     });
 
@@ -690,37 +666,6 @@ describe("GameCron", () => {
       );
     });
 
-    test("should check promotion expiry with gameId", async () => {
-      // Arrange
-      const mockDeps = createMockDependencies();
-      const gameCron = new GameCron(mockDeps);
-      gameCron.gameData.gameConfigs = {
-        gameId: 123,
-        enabled: true,
-        odds: { margin: 0.05 },
-        originalOdds: {} as any,
-        enableFreeBet: false,
-        boostedChoices: false,
-      };
-      gameCron.gameData.remainingTime = 15000;
-      gameCron.definition.durations = {
-        wholeRound: 30000,
-        placingBets: 20000,
-        lockingBet: 5000,
-      };
-
-      // Act
-      await gameCron.proceed();
-
-      // Assert
-      expect(
-        mockDeps.promotionFreeSpinsConsumer.checkExpiry,
-      ).toHaveBeenCalledWith(123);
-      expect(
-        mockDeps.promotionFreeSpinsConsumer.checkExpiry,
-      ).toHaveBeenCalledTimes(1);
-    });
-
     test("should handle complete round lifecycle", async () => {
       // Arrange
       const mockDeps = createMockDependencies();
@@ -754,9 +699,6 @@ describe("GameCron", () => {
       expect(gameCron.resetForNewRound).toHaveBeenCalledTimes(1);
       expect(gameCron.calculateOdds).toHaveBeenCalledTimes(1);
       expect(mockDeps.bot.reset).toHaveBeenCalledTimes(1);
-      expect(
-        mockDeps.promotionFreeSpinsConsumer.checkExpiry,
-      ).toHaveBeenCalledWith(1);
     });
 
     test("should reset settlementResultFromAdmin to empty object after settling", async () => {

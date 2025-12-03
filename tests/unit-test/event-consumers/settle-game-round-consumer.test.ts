@@ -889,7 +889,7 @@ describe("SettleGameRoundConsumer", () => {
         initRoundId: 5,
         time: new Date(),
         exchangeRateId: 1,
-        margin: generateMargins(0.05),
+        margins: generateMargins(0.05),
       };
       (mockDeps.roundsRepository.create as jest.Mock).mockResolvedValue(
         mockNewRound,
@@ -908,7 +908,7 @@ describe("SettleGameRoundConsumer", () => {
         initRoundId: 5,
         time: expect.any(Date),
         exchangeRateId: 1,
-        margin: generateMargins(0.05),
+        margins: generateMargins(0.05),
       });
     });
 

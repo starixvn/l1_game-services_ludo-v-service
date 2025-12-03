@@ -21,7 +21,7 @@ export class SettleGameRoundConsumer extends Table.EventConsumers
       initRoundId: this.gameData.initRoundId,
       time: new Date(),
       exchangeRateId: exchangeRates.exId,
-      margin: this.gameData.gameConfigs.odds,
+      margins: this.gameData.gameConfigs.odds,
     });
 
     if (newRound) {

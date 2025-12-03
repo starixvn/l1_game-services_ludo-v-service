@@ -7,7 +7,7 @@ import {
 import { RunningRoundInfoPublisher } from "../event-publishers/index.js";
 import GameData from "../game-data.js";
 import GameDefinition from "../game-definition.js";
-import { MARGIN_KEYS, ODDS_KEYS } from "../constants.js";
+import { convertMarginKeys } from "../helpers/convert-margin-keys.js";
 
 export class GameCron extends Table.Crons.TableGameCron {
   declare bot: Table.Crons.TableGameBot;
@@ -63,21 +63,13 @@ export class GameCron extends Table.Crons.TableGameCron {
     await this.getSettingForNewRound();
     await this.updateExchangeRates();
     this.checkPromotionReadiness();
-    await this.promotionFreeSpinsConsumer.loadPromotionsRunning();
     await this.unsettledRoundConsumer.proceed();
     this.startCron();
   }
 
   async calculateOdds() {
     const odds = this.gameData.gameConfigs.odds;
-    const margins = ODDS_KEYS.map((key) => key as keyof typeof odds).reduce(
-      (acc, key) => {
-        const marginKey = MARGIN_KEYS[key as keyof typeof MARGIN_KEYS];
-        acc[key] = odds[marginKey];
-        return acc;
-      },
-      {} as { [key: string]: number },
-    );
+    const margins = convertMarginKeys(odds);
     this.gameData.odds = await this.definition.generateOdds(
       margins,
       this.gameData.result,
@@ -114,15 +106,10 @@ export class GameCron extends Table.Crons.TableGameCron {
       this.gameData.remainingTime = durations.wholeRound;
       await this.roundResultConsumer.generateResult();
       await this.settleGameRoundConsumer.settleRound();
-      await this.promotionFreeSpinsConsumer.loadPromotionsRunning();
       this.gameData.settlementResultFromAdmin = {} as any;
     } else if (remainingTime < durations.placingBets) {
       this.bot && (await this.bot.run());
       this.runningRoundInfoPublisher.publish();
     }
-
-    await this.promotionFreeSpinsConsumer.checkExpiry(
-      this.gameData.gameConfigs.gameId,
-    );
   }
 }
