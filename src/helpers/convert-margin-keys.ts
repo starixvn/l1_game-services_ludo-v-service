@@ -1,5 +1,4 @@
-import { MARGIN_KEYS } from "../constants.js";
-import { ODDS_KEYS } from "../constants.js";
+import { MARGIN_KEYS, ODDS_KEYS } from "../constants.js";
 
 export const convertMarginKeys = (margins: { [key: string]: number }) => {
   return ODDS_KEYS.map((key) => key as keyof typeof margins).reduce(
