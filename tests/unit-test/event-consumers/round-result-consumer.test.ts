@@ -1330,6 +1330,14 @@ describe("RoundResultConsumer", () => {
       const adminResult = {
         dice: [6, 6],
         currentBoardState: adminBoardState,
+        currentTurnIndex: 1,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
       };
       consumer.gameData.settlementResultFromAdmin = {
         roundId: 10,
@@ -1394,7 +1402,18 @@ describe("RoundResultConsumer", () => {
       expect(mockDeps.definition.generateOdds).toHaveBeenCalledTimes(1);
       expect(mockDeps.definition.generateOdds).toHaveBeenCalledWith(
         expect.any(Object), // converted margin keys
-        adminResult,
+        {
+          board: adminBoardState,
+          nextTurnIndex: 1,
+          currentPlayers: [
+            PlayerColor.RED,
+            PlayerColor.GREEN,
+            PlayerColor.YELLOW,
+            PlayerColor.BLUE,
+          ],
+          winners: [],
+          dice: [6, 6],
+        },
       );
       expect(consumer.gameData.odds).toEqual(newOdds);
     });

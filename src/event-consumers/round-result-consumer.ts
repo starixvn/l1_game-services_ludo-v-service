@@ -4,9 +4,8 @@ import GameDefinition from "../game-definition.js";
 import { generateDice } from "../helpers/index.js";
 import { convertMarginKeys } from "../helpers/convert-margin-keys.js";
 
-export class RoundResultConsumer
-  extends Core.BaseEventConsumers.RoundResultConsumer
-{
+export class RoundResultConsumer extends Core.BaseEventConsumers
+  .RoundResultConsumer {
   declare gameData: GameData;
   declare definition: GameDefinition;
 
@@ -21,7 +20,14 @@ export class RoundResultConsumer
       this.gameData.initRoundId = this.gameData.roundId;
       this.gameData.odds = await this.definition.generateOdds(
         convertMarginKeys(this.gameData.gameConfigs.odds),
-        result,
+        {
+          board: result.currentBoardState,
+          nextTurnIndex: result.currentTurnIndex,
+          currentPlayers: result.currentPlayers,
+          winners: result.winners,
+          dice: result.dice,
+          action: result.action,
+        },
       );
     }
 
