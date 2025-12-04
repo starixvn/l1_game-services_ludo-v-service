@@ -75,27 +75,26 @@ describe("place bet", () => {
   describe("when place bet with invalid data", () => {
     it.each([
       {
-        payload: { amount: 100, clientSeed: "1234" },
+        payload: { amount: 100 },
         expected: { errorCode: "SB1935" },
       },
       {
-        payload: { betChoice: "big", clientSeed: "1234" },
+        payload: { betChoice: "big" },
         expected: { errorCode: "SB1935" },
       },
       {
         payload: {
           amount: 100,
           betChoice: "invalidChoice",
-          clientSeed: "1234",
         },
         expected: { errorCode: "SB1935" },
       },
       {
-        payload: { amount: -100, betChoice: "big", clientSeed: "1234" },
+        payload: { amount: -100, betChoice: "big" },
         expected: { errorCode: "SB1935" },
       },
       {
-        payload: { amount: 0, betChoice: "big", clientSeed: "1234" },
+        payload: { amount: 0, betChoice: "big" },
         expected: { errorCode: "SB1935" },
       },
     ])(

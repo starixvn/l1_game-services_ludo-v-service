@@ -3,8 +3,8 @@ import gameSettings from "../../../src/game-settings.js";
 export default {
   ...gameSettings,
   durations: {
-    wholeRound: 10,
-    placingBets: 8,
+    wholeRound: 15,
+    placingBets: 10,
     lockingBet: 2,
   },
 };

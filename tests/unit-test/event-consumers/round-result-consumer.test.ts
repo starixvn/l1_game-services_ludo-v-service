@@ -1187,6 +1187,579 @@ describe("RoundResultConsumer", () => {
     });
   });
 
+  describe("generateResult with currentBoardState from admin", () => {
+    test("should reset initRoundId to current roundId when admin provides currentBoardState", async () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new RoundResultConsumer(
+        mockDeps.gameData,
+        mockDeps.definition,
+        mockDeps.roundResultPublisher,
+        mockDeps.resultsRepository,
+        mockDeps.provablyFairConsumer,
+      );
+      consumer.gameData.roundId = 10;
+      consumer.gameData.initRoundId = 5; // Previous initRoundId
+      consumer.gameData.gameConfigs = {
+        gameId: 163,
+        enabled: true,
+        odds: {
+          big: 1,
+          small: 1,
+          odd: 1,
+          even: 1,
+          kick: 1,
+          noKick: 1,
+          move: 1,
+          noMove: 1,
+          release: 1,
+          noRelease: 1,
+          goStable: 1,
+          noStable: 1,
+        },
+        originalOdds: {} as any,
+        enableFreeBet: false,
+        boostedChoices: false,
+      };
+      const adminBoardState = {
+        [PlayerColor.RED]: [10, 20, 0, 0],
+        [PlayerColor.GREEN]: [5, 0, 0, 0],
+        [PlayerColor.YELLOW]: [0, 0, 0, 0],
+        [PlayerColor.BLUE]: [0, 0, 0, 0],
+      };
+      consumer.gameData.settlementResultFromAdmin = {
+        roundId: 10,
+        result: {
+          dice: [6, 6],
+          currentBoardState: adminBoardState,
+        } as any,
+      };
+      consumer.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [],
+        action: {
+          oldPosition: 0,
+          newPosition: 0,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      const mockResult: IResult = {
+        board: adminBoardState,
+        nextTurnIndex: 1,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [6, 6],
+        action: {
+          oldPosition: 0,
+          newPosition: 10,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      (mockDeps.definition.generateResult as jest.Mock).mockResolvedValue(
+        mockResult,
+      );
+      (mockDeps.definition.generateOdds as jest.Mock).mockResolvedValue({
+        big: 2.0,
+        small: 1.8,
+      });
+
+      // Act
+      await consumer.generateResult();
+
+      // Assert
+      expect(consumer.gameData.initRoundId).toBe(10); // Should be reset to current roundId
+    });
+
+    test("should regenerate odds when admin provides currentBoardState", async () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new RoundResultConsumer(
+        mockDeps.gameData,
+        mockDeps.definition,
+        mockDeps.roundResultPublisher,
+        mockDeps.resultsRepository,
+        mockDeps.provablyFairConsumer,
+      );
+      consumer.gameData.roundId = 10;
+      consumer.gameData.initRoundId = 5;
+      consumer.gameData.gameConfigs = {
+        gameId: 163,
+        enabled: true,
+        odds: {
+          big: 1,
+          small: 1,
+          odd: 1,
+          even: 1,
+          kick: 1,
+          noKick: 1,
+          move: 1,
+          noMove: 1,
+          release: 1,
+          noRelease: 1,
+          goStable: 1,
+          noStable: 1,
+        },
+        originalOdds: {} as any,
+        enableFreeBet: false,
+        boostedChoices: false,
+      };
+      const adminBoardState = {
+        [PlayerColor.RED]: [10, 20, 0, 0],
+        [PlayerColor.GREEN]: [5, 0, 0, 0],
+        [PlayerColor.YELLOW]: [0, 0, 0, 0],
+        [PlayerColor.BLUE]: [0, 0, 0, 0],
+      };
+      const adminResult = {
+        dice: [6, 6],
+        currentBoardState: adminBoardState,
+      };
+      consumer.gameData.settlementResultFromAdmin = {
+        roundId: 10,
+        result: adminResult as any,
+      };
+      consumer.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [],
+        action: {
+          oldPosition: 0,
+          newPosition: 0,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      const mockResult: IResult = {
+        board: adminBoardState,
+        nextTurnIndex: 1,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [6, 6],
+        action: {
+          oldPosition: 0,
+          newPosition: 10,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      const newOdds = {
+        big: 2.0,
+        small: 1.8,
+        odd: 1.9,
+        even: 1.9,
+      };
+      (mockDeps.definition.generateResult as jest.Mock).mockResolvedValue(
+        mockResult,
+      );
+      (mockDeps.definition.generateOdds as jest.Mock).mockResolvedValue(
+        newOdds,
+      );
+
+      // Act
+      await consumer.generateResult();
+
+      // Assert
+      expect(mockDeps.definition.generateOdds).toHaveBeenCalledTimes(1);
+      expect(mockDeps.definition.generateOdds).toHaveBeenCalledWith(
+        expect.any(Object), // converted margin keys
+        adminResult,
+      );
+      expect(consumer.gameData.odds).toEqual(newOdds);
+    });
+
+    test("should NOT reset initRoundId when admin result does not contain currentBoardState", async () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new RoundResultConsumer(
+        mockDeps.gameData,
+        mockDeps.definition,
+        mockDeps.roundResultPublisher,
+        mockDeps.resultsRepository,
+        mockDeps.provablyFairConsumer,
+      );
+      consumer.gameData.roundId = 10;
+      consumer.gameData.initRoundId = 5; // Should remain unchanged
+      consumer.gameData.gameConfigs = {
+        gameId: 163,
+        enabled: true,
+        odds: {
+          big: 1,
+          small: 1,
+          odd: 1,
+          even: 1,
+          kick: 1,
+          noKick: 1,
+          move: 1,
+          noMove: 1,
+          release: 1,
+          noRelease: 1,
+          goStable: 1,
+          noStable: 1,
+        },
+        originalOdds: {} as any,
+        enableFreeBet: false,
+        boostedChoices: false,
+      };
+      consumer.gameData.settlementResultFromAdmin = {
+        roundId: 10,
+        result: {
+          dice: [3, 4], // Only dice, no currentBoardState
+        },
+      };
+      consumer.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [],
+        action: {
+          oldPosition: 0,
+          newPosition: 0,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      const mockResult: IResult = {
+        board: {
+          [PlayerColor.RED]: [7, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 1,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [3, 4],
+        action: {
+          oldPosition: 0,
+          newPosition: 7,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      (mockDeps.definition.generateResult as jest.Mock).mockResolvedValue(
+        mockResult,
+      );
+
+      // Act
+      await consumer.generateResult();
+
+      // Assert
+      expect(consumer.gameData.initRoundId).toBe(5); // Should remain unchanged
+    });
+
+    test("should NOT regenerate odds when admin result does not contain currentBoardState", async () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new RoundResultConsumer(
+        mockDeps.gameData,
+        mockDeps.definition,
+        mockDeps.roundResultPublisher,
+        mockDeps.resultsRepository,
+        mockDeps.provablyFairConsumer,
+      );
+      consumer.gameData.roundId = 10;
+      consumer.gameData.initRoundId = 5;
+      consumer.gameData.gameConfigs = {
+        gameId: 163,
+        enabled: true,
+        odds: {
+          big: 1,
+          small: 1,
+          odd: 1,
+          even: 1,
+          kick: 1,
+          noKick: 1,
+          move: 1,
+          noMove: 1,
+          release: 1,
+          noRelease: 1,
+          goStable: 1,
+          noStable: 1,
+        },
+        originalOdds: {} as any,
+        enableFreeBet: false,
+        boostedChoices: false,
+      };
+      consumer.gameData.settlementResultFromAdmin = {
+        roundId: 10,
+        result: {
+          dice: [3, 4], // Only dice, no currentBoardState
+        },
+      };
+      consumer.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [],
+        action: {
+          oldPosition: 0,
+          newPosition: 0,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      const mockResult: IResult = {
+        board: {
+          [PlayerColor.RED]: [7, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 1,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [3, 4],
+        action: {
+          oldPosition: 0,
+          newPosition: 7,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      (mockDeps.definition.generateResult as jest.Mock).mockResolvedValue(
+        mockResult,
+      );
+
+      // Act
+      await consumer.generateResult();
+
+      // Assert
+      expect(mockDeps.definition.generateOdds).not.toHaveBeenCalled();
+    });
+
+    test("should NOT reset initRoundId when no admin result exists", async () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new RoundResultConsumer(
+        mockDeps.gameData,
+        mockDeps.definition,
+        mockDeps.roundResultPublisher,
+        mockDeps.resultsRepository,
+        mockDeps.provablyFairConsumer,
+      );
+      consumer.gameData.roundId = 10;
+      consumer.gameData.initRoundId = 5; // Should remain unchanged
+      consumer.gameData.settlementResultFromAdmin = undefined as any;
+      consumer.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [],
+        action: {
+          oldPosition: 0,
+          newPosition: 0,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      const mockResult: IResult = {
+        board: {
+          [PlayerColor.RED]: [7, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 1,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [3, 4],
+        action: {
+          oldPosition: 0,
+          newPosition: 7,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      (mockDeps.definition.generateResult as jest.Mock).mockResolvedValue(
+        mockResult,
+      );
+
+      // Act
+      await consumer.generateResult();
+
+      // Assert
+      expect(consumer.gameData.initRoundId).toBe(5); // Should remain unchanged
+      expect(mockDeps.definition.generateOdds).not.toHaveBeenCalled();
+    });
+
+    test("should use admin currentBoardState in generateResult call", async () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new RoundResultConsumer(
+        mockDeps.gameData,
+        mockDeps.definition,
+        mockDeps.roundResultPublisher,
+        mockDeps.resultsRepository,
+        mockDeps.provablyFairConsumer,
+      );
+      consumer.gameData.roundId = 10;
+      consumer.gameData.initRoundId = 5;
+      consumer.gameData.gameConfigs = {
+        gameId: 163,
+        enabled: true,
+        odds: {
+          big: 1,
+          small: 1,
+          odd: 1,
+          even: 1,
+          kick: 1,
+          noKick: 1,
+          move: 1,
+          noMove: 1,
+          release: 1,
+          noRelease: 1,
+          goStable: 1,
+          noStable: 1,
+        },
+        originalOdds: {} as any,
+        enableFreeBet: false,
+        boostedChoices: false,
+      };
+      const adminBoardState = {
+        [PlayerColor.RED]: [30, 40, 50, 0],
+        [PlayerColor.GREEN]: [15, 25, 0, 0],
+        [PlayerColor.YELLOW]: [10, 0, 0, 0],
+        [PlayerColor.BLUE]: [5, 0, 0, 0],
+      };
+      consumer.gameData.settlementResultFromAdmin = {
+        roundId: 10,
+        result: {
+          dice: [6, 6],
+          currentBoardState: adminBoardState,
+          currentTurnIndex: 2,
+          currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
+          winners: [],
+        } as any,
+      };
+      consumer.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ],
+        winners: [],
+        dice: [],
+        action: {
+          oldPosition: 0,
+          newPosition: 0,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      const mockResult: IResult = {
+        board: adminBoardState,
+        nextTurnIndex: 3,
+        currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
+        winners: [],
+        dice: [6, 6],
+        action: {
+          oldPosition: 50,
+          newPosition: 57,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      (mockDeps.definition.generateResult as jest.Mock).mockResolvedValue(
+        mockResult,
+      );
+      (mockDeps.definition.generateOdds as jest.Mock).mockResolvedValue({});
+
+      // Act
+      await consumer.generateResult();
+
+      // Assert
+      expect(mockDeps.definition.generateResult).toHaveBeenCalledWith(
+        expect.objectContaining({
+          currentBoardState: adminBoardState,
+          dice: [6, 6],
+          currentTurnIndex: 2,
+          currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
+          winners: [],
+        }),
+      );
+    });
+  });
+
   describe("resultFromAdmin", () => {
     test("should return settlement result when roundId matches", () => {
       // Arrange
