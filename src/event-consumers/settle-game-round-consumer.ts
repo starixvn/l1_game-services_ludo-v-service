@@ -4,6 +4,7 @@ import GameData from "../game-data.js";
 import { IBet } from "../models/interfaces/bet.js";
 import { IResult } from "../models/interfaces/result.js";
 import { ISettlementResult } from "../models/interfaces/settlement-result.js";
+import { ALL_PLAYERS } from "../constants.js";
 
 export class SettleGameRoundConsumer extends Table.EventConsumers
   .TableSettleGameRoundConsumer {
@@ -57,7 +58,6 @@ export class SettleGameRoundConsumer extends Table.EventConsumers
     settlementResult: ISettlementResult,
     roundId: number,
   ) {
-    // Filter out settlement result entries where odds are 0
     const filteredSettlementResult = Object.entries(settlementResult).reduce(
       (acc, [key, value]) => {
         const oddsValue =
@@ -81,6 +81,10 @@ export class SettleGameRoundConsumer extends Table.EventConsumers
           player: result.action.playerColor,
           playerColor: undefined,
         },
+        nextPlayer:
+          result.winners.length > 0
+            ? ALL_PLAYERS[result.nextTurnIndex]
+            : undefined,
       },
       settlementResult: filteredSettlementResult,
       roundId,

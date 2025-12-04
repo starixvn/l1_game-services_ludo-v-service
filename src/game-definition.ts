@@ -14,6 +14,7 @@ export type GenerateResultData = {
 export default class GameDefinition extends Table.TableGameDefinition {
   declare durations: {
     wholeRound: number;
+    wholeRoundWithWinner: number;
     placingBets: number;
     lockingBet: number;
   };

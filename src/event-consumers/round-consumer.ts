@@ -7,6 +7,7 @@ import { gameManagementClient } from "sc-game-management-client";
 import GameData from "../game-data.js";
 import GameDefinition from "../game-definition.js";
 import { IRound } from "../models/interfaces/round.js";
+import { initNewBoard } from "../helpers/index.js";
 
 export class RoundConsumer {
   roundsRepository: mongoose.Model<IRound>;
@@ -38,11 +39,29 @@ export class RoundConsumer {
 
     if (lastRound) {
       this.gameData.roundId = lastRound.id + 1;
-      this.gameData.result = lastRound.result;
-      this.gameData.initRoundId =
-        lastRound.result.winners.length > 0
-          ? this.gameData.roundId
-          : lastRound.initRoundId;
+      const existWinner = lastRound.result.winners.length > 0;
+      this.gameData.result = existWinner
+        ? {
+            board: initNewBoard(),
+            nextTurnIndex: lastRound.result.nextTurnIndex,
+            currentPlayers: [
+              PlayerColor.RED,
+              PlayerColor.GREEN,
+              PlayerColor.YELLOW,
+              PlayerColor.BLUE,
+            ],
+            winners: [],
+            action: {
+              oldPosition: 0,
+              newPosition: 0,
+              playerColor: PlayerColor.RED,
+            },
+            dice: [],
+          }
+        : lastRound.result;
+      this.gameData.initRoundId = existWinner
+        ? this.gameData.roundId
+        : lastRound.initRoundId;
     } else {
       this.gameData.roundId = await this.getLastArchiveRound();
       this.gameData.result.board = {

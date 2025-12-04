@@ -230,6 +230,248 @@ describe("RoundConsumer", () => {
         expect(consumer.gameData.initRoundId).toBe(21); // new roundId
       });
 
+      test("should reset board to initial state when there are winners", async () => {
+        // Arrange
+        const mockDeps = createMockDependencies();
+        const consumer = new RoundConsumer(mockDeps);
+        const mockLastRound: Partial<IRound> = {
+          id: 20,
+          result: {
+            board: {
+              [PlayerColor.RED]: [57, 57, 57, 57],
+              [PlayerColor.GREEN]: [10, 20, 0, 0],
+              [PlayerColor.YELLOW]: [5, 0, 0, 0],
+              [PlayerColor.BLUE]: [0, 0, 0, 0],
+            },
+            nextTurnIndex: 2,
+            currentPlayers: [PlayerColor.RED],
+            winners: [PlayerColor.RED],
+            dice: [6, 6],
+            action: {
+              oldPosition: 51,
+              newPosition: 57,
+              playerColor: PlayerColor.RED,
+            },
+          },
+          initRoundId: 5,
+        };
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
+          lean: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(mockLastRound),
+          }),
+        } as any);
+
+        // Act
+        await consumer.initNewRound();
+
+        // Assert
+        expect(consumer.gameData.result.board).toEqual({
+          [PlayerColor.RED]: [0, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        });
+      });
+
+      test("should reset currentPlayers to all four colors when there are winners", async () => {
+        // Arrange
+        const mockDeps = createMockDependencies();
+        const consumer = new RoundConsumer(mockDeps);
+        const mockLastRound: Partial<IRound> = {
+          id: 20,
+          result: {
+            board: {
+              [PlayerColor.RED]: [57, 57, 57, 57],
+              [PlayerColor.GREEN]: [0, 0, 0, 0],
+              [PlayerColor.YELLOW]: [0, 0, 0, 0],
+              [PlayerColor.BLUE]: [0, 0, 0, 0],
+            },
+            nextTurnIndex: 0,
+            currentPlayers: [PlayerColor.RED],
+            winners: [PlayerColor.RED],
+            dice: [6, 6],
+            action: {
+              oldPosition: 51,
+              newPosition: 57,
+              playerColor: PlayerColor.RED,
+            },
+          },
+          initRoundId: 5,
+        };
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
+          lean: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(mockLastRound),
+          }),
+        } as any);
+
+        // Act
+        await consumer.initNewRound();
+
+        // Assert
+        expect(consumer.gameData.result.currentPlayers).toEqual([
+          PlayerColor.RED,
+          PlayerColor.GREEN,
+          PlayerColor.YELLOW,
+          PlayerColor.BLUE,
+        ]);
+      });
+
+      test("should reset winners to empty array when there are winners", async () => {
+        // Arrange
+        const mockDeps = createMockDependencies();
+        const consumer = new RoundConsumer(mockDeps);
+        const mockLastRound: Partial<IRound> = {
+          id: 20,
+          result: {
+            board: {
+              [PlayerColor.RED]: [57, 57, 57, 57],
+              [PlayerColor.GREEN]: [0, 0, 0, 0],
+              [PlayerColor.YELLOW]: [0, 0, 0, 0],
+              [PlayerColor.BLUE]: [0, 0, 0, 0],
+            },
+            nextTurnIndex: 0,
+            currentPlayers: [PlayerColor.RED],
+            winners: [PlayerColor.RED],
+            dice: [6, 6],
+            action: {
+              oldPosition: 51,
+              newPosition: 57,
+              playerColor: PlayerColor.RED,
+            },
+          },
+          initRoundId: 5,
+        };
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
+          lean: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(mockLastRound),
+          }),
+        } as any);
+
+        // Act
+        await consumer.initNewRound();
+
+        // Assert
+        expect(consumer.gameData.result.winners).toEqual([]);
+      });
+
+      test("should reset dice to empty array when there are winners", async () => {
+        // Arrange
+        const mockDeps = createMockDependencies();
+        const consumer = new RoundConsumer(mockDeps);
+        const mockLastRound: Partial<IRound> = {
+          id: 20,
+          result: {
+            board: {
+              [PlayerColor.RED]: [57, 57, 57, 57],
+              [PlayerColor.GREEN]: [0, 0, 0, 0],
+              [PlayerColor.YELLOW]: [0, 0, 0, 0],
+              [PlayerColor.BLUE]: [0, 0, 0, 0],
+            },
+            nextTurnIndex: 0,
+            currentPlayers: [PlayerColor.RED],
+            winners: [PlayerColor.RED],
+            dice: [6, 6],
+            action: {
+              oldPosition: 51,
+              newPosition: 57,
+              playerColor: PlayerColor.RED,
+            },
+          },
+          initRoundId: 5,
+        };
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
+          lean: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(mockLastRound),
+          }),
+        } as any);
+
+        // Act
+        await consumer.initNewRound();
+
+        // Assert
+        expect(consumer.gameData.result.dice).toEqual([]);
+      });
+
+      test("should reset action when there are winners", async () => {
+        // Arrange
+        const mockDeps = createMockDependencies();
+        const consumer = new RoundConsumer(mockDeps);
+        const mockLastRound: Partial<IRound> = {
+          id: 20,
+          result: {
+            board: {
+              [PlayerColor.RED]: [57, 57, 57, 57],
+              [PlayerColor.GREEN]: [0, 0, 0, 0],
+              [PlayerColor.YELLOW]: [0, 0, 0, 0],
+              [PlayerColor.BLUE]: [0, 0, 0, 0],
+            },
+            nextTurnIndex: 0,
+            currentPlayers: [PlayerColor.RED],
+            winners: [PlayerColor.RED],
+            dice: [6, 6],
+            action: {
+              oldPosition: 51,
+              newPosition: 57,
+              playerColor: PlayerColor.RED,
+            },
+          },
+          initRoundId: 5,
+        };
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
+          lean: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(mockLastRound),
+          }),
+        } as any);
+
+        // Act
+        await consumer.initNewRound();
+
+        // Assert
+        expect(consumer.gameData.result.action).toEqual({
+          oldPosition: 0,
+          newPosition: 0,
+          playerColor: PlayerColor.RED,
+        });
+      });
+
+      test("should preserve nextTurnIndex from lastRound when there are winners", async () => {
+        // Arrange
+        const mockDeps = createMockDependencies();
+        const consumer = new RoundConsumer(mockDeps);
+        const mockLastRound: Partial<IRound> = {
+          id: 20,
+          result: {
+            board: {
+              [PlayerColor.RED]: [57, 57, 57, 57],
+              [PlayerColor.GREEN]: [0, 0, 0, 0],
+              [PlayerColor.YELLOW]: [0, 0, 0, 0],
+              [PlayerColor.BLUE]: [0, 0, 0, 0],
+            },
+            nextTurnIndex: 3,
+            currentPlayers: [PlayerColor.RED],
+            winners: [PlayerColor.RED],
+            dice: [6, 6],
+            action: {
+              oldPosition: 51,
+              newPosition: 57,
+              playerColor: PlayerColor.RED,
+            },
+          },
+          initRoundId: 5,
+        };
+        (mockDeps.roundsRepository.findOne as jest.Mock).mockReturnValue({
+          lean: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(mockLastRound),
+          }),
+        } as any);
+
+        // Act
+        await consumer.initNewRound();
+
+        // Assert
+        expect(consumer.gameData.result.nextTurnIndex).toBe(3);
+      });
+
       test("should keep initRoundId from lastRound when there are no winners", async () => {
         // Arrange
         const mockDeps = createMockDependencies();

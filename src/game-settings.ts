@@ -3,6 +3,7 @@ import { BET_CHOICES, ODDS_KEYS } from "./constants.js";
 export default {
   id: 163,
   durations: {
+    wholeRoundWithWinner: 42,
     wholeRound: 32,
     placingBets: 17,
     lockingBet: 3,

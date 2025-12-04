@@ -49,9 +49,11 @@ describe("generateResult", () => {
     (DiceState as jest.Mock).mockImplementation((dice) => ({ dice }));
   });
 
-  describe("Board reset on winners", () => {
-    test("should reset board to initial state when there are winners", async () => {
+  describe("nextTurnIndex behavior with winners", () => {
+    test("should randomize nextTurnIndex when there are winners", async () => {
       // Arrange
+      mockSecureRandomRange.mockReturnValueOnce(2); // For randomizing turn index
+
       const data: GenerateResultData = {
         currentBoardState: {
           [PlayerColor.RED]: [10, 20, 30, 40],
@@ -73,36 +75,28 @@ describe("generateResult", () => {
       mockUpdateGameState.mockResolvedValue({
         gameState: {
           board: {
-            [PlayerColor.RED]: [0, 0, 0, 0],
-            [PlayerColor.GREEN]: [0, 0, 0, 0],
-            [PlayerColor.YELLOW]: [0, 0, 0, 0],
-            [PlayerColor.BLUE]: [0, 0, 0, 0],
+            [PlayerColor.RED]: [10, 20, 30, 40],
+            [PlayerColor.GREEN]: [15, 25, 35, 45],
+            [PlayerColor.YELLOW]: [12, 22, 32, 42],
+            [PlayerColor.BLUE]: [18, 28, 38, 48],
           },
           currentPlayer: PlayerColor.RED,
           playerAction: { type: "skip", oldPosition: 0, newPosition: 0 },
-          winners: [],
+          winners: [PlayerColor.RED],
         },
-        nextTurn: 0,
+        nextTurn: 3,
       } as any);
 
       // Act
       const result = await generateResult(data);
 
       // Assert
-      expect(data.currentBoardState).toEqual({
-        [PlayerColor.RED]: [0, 0, 0, 0],
-        [PlayerColor.GREEN]: [0, 0, 0, 0],
-        [PlayerColor.YELLOW]: [0, 0, 0, 0],
-        [PlayerColor.BLUE]: [0, 0, 0, 0],
-      });
-      expect(data.winners).toEqual([]);
+      expect(mockSecureRandomRange).toHaveBeenCalledWith(0, 3);
+      expect(result.nextTurnIndex).toBe(2); // randomized value
     });
 
-    test("should randomize turn index when resetting board", async () => {
+    test("should use nextTurn from updateGameState when no winners", async () => {
       // Arrange
-      mockSecureRandomRange.mockReturnValueOnce(2); // For turn index
-      mockSecureRandomRange.mockReturnValue(4); // For dice
-
       const data: GenerateResultData = {
         currentBoardState: {
           [PlayerColor.RED]: [10, 20, 30, 40],
@@ -117,35 +111,34 @@ describe("generateResult", () => {
           PlayerColor.BLUE,
         ],
         currentTurnIndex: 0,
-        winners: [PlayerColor.GREEN, PlayerColor.YELLOW],
+        winners: [],
         dice: [1, 2],
       };
 
       mockUpdateGameState.mockResolvedValue({
         gameState: {
           board: {
-            [PlayerColor.RED]: [0, 0, 0, 0],
+            [PlayerColor.RED]: [10, 20, 30, 40],
             [PlayerColor.GREEN]: [0, 0, 0, 0],
             [PlayerColor.YELLOW]: [0, 0, 0, 0],
             [PlayerColor.BLUE]: [0, 0, 0, 0],
           },
-          currentPlayer: PlayerColor.YELLOW,
+          currentPlayer: PlayerColor.GREEN,
           playerAction: { type: "skip", oldPosition: 0, newPosition: 0 },
           winners: [],
         },
-        nextTurn: 2,
+        nextTurn: 1,
       } as any);
 
       // Act
-      await generateResult(data);
+      const result = await generateResult(data);
 
       // Assert
-      expect(mockSecureRandomRange).toHaveBeenCalledWith(0, 3);
-      expect(data.currentTurnIndex).toBe(2);
+      expect(result.nextTurnIndex).toBe(1); // from updateGameState
     });
 
-    test("should reset current players to all four colors", async () => {
-      // Arrange
+    test("should accumulate winners from gameState into input data", async () => {
+      // Arrange - winners from previous rounds are accumulated with new winners
       const data: GenerateResultData = {
         currentBoardState: {
           [PlayerColor.RED]: [10, 20, 30, 40],
@@ -162,14 +155,14 @@ describe("generateResult", () => {
       mockUpdateGameState.mockResolvedValue({
         gameState: {
           board: {
-            [PlayerColor.RED]: [0, 0, 0, 0],
+            [PlayerColor.RED]: [10, 20, 30, 40],
             [PlayerColor.GREEN]: [0, 0, 0, 0],
             [PlayerColor.YELLOW]: [0, 0, 0, 0],
             [PlayerColor.BLUE]: [0, 0, 0, 0],
           },
           currentPlayer: PlayerColor.RED,
           playerAction: { type: "skip", oldPosition: 0, newPosition: 0 },
-          winners: [],
+          winners: [PlayerColor.RED],
         },
         nextTurn: 0,
       } as any);
@@ -177,13 +170,9 @@ describe("generateResult", () => {
       // Act
       await generateResult(data);
 
-      // Assert
-      expect(data.currentPlayers).toEqual([
-        PlayerColor.RED,
-        PlayerColor.GREEN,
-        PlayerColor.YELLOW,
-        PlayerColor.BLUE,
-      ]);
+      // Assert - winners are accumulated (previous + new from gameState)
+      expect(data.currentPlayers).toEqual([PlayerColor.RED, PlayerColor.GREEN]);
+      expect(data.winners).toEqual([PlayerColor.YELLOW, PlayerColor.RED]);
     });
   });
 
@@ -304,21 +293,26 @@ describe("generateResult", () => {
       };
 
       // Mock updateGameState to call the callback function
-      mockUpdateGameState.mockImplementation(async (board, players, turnIndex, dice, moveCallback) => {
-        // Call the callback to test line 38
-        await moveCallback(mockMoveInput);
-        return {
-          gameState: {
-            board: data.currentBoardState,
-            currentPlayer: PlayerColor.RED,
-            playerAction: { type: "skip", oldPosition: 0, newPosition: 0 },
-            winners: [],
-          },
-          nextTurn: 0,
-        } as any;
-      });
+      mockUpdateGameState.mockImplementation(
+        async (board, players, turnIndex, dice, moveCallback) => {
+          // Call the callback to test line 38
+          await moveCallback(mockMoveInput);
+          return {
+            gameState: {
+              board: data.currentBoardState,
+              currentPlayer: PlayerColor.RED,
+              playerAction: { type: "skip", oldPosition: 0, newPosition: 0 },
+              winners: [],
+            },
+            nextTurn: 0,
+          } as any;
+        },
+      );
 
-      mockRuleBotMove.mockResolvedValue({ oldPosition: 0, newPosition: 0 } as any);
+      mockRuleBotMove.mockResolvedValue({
+        oldPosition: 0,
+        newPosition: 0,
+      } as any);
 
       // Act
       await generateResult(data);
@@ -469,7 +463,7 @@ describe("generateResult", () => {
   });
 
   describe("Winners handling", () => {
-    test("should reset winners from previous game and only include new winners", async () => {
+    test("should accumulate winners from gameState with existing winners", async () => {
       // Arrange
       mockSecureRandomRange.mockReturnValue(5);
 
@@ -482,7 +476,7 @@ describe("generateResult", () => {
         },
         currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
         currentTurnIndex: 0,
-        winners: [PlayerColor.YELLOW], // Previous game had a winner
+        winners: [PlayerColor.YELLOW], // Previous winner
         dice: [1, 2],
       };
 
@@ -491,7 +485,7 @@ describe("generateResult", () => {
           board: data.currentBoardState,
           currentPlayer: PlayerColor.RED,
           playerAction: { type: "skip", oldPosition: 0, newPosition: 0 },
-          winners: [PlayerColor.BLUE], // New game has new winner
+          winners: [PlayerColor.BLUE], // New winner from this round
         },
         nextTurn: 1,
       } as any);
@@ -500,8 +494,8 @@ describe("generateResult", () => {
       const result = await generateResult(data);
 
       // Assert
-      // When there are previous winners, the game resets and only new winners are included
-      expect(result.winners).toEqual([PlayerColor.BLUE]);
+      // Winners are accumulated - previous winners + new winners from gameState
+      expect(result.winners).toEqual([PlayerColor.YELLOW, PlayerColor.BLUE]);
     });
 
     test("should handle no winners in current round", async () => {

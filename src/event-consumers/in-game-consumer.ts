@@ -33,7 +33,6 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
   async buildPayload(realPlayer: RealPlayer) {
     const user = await this.getUserInfo(realPlayer);
 
-    const { margin } = this.gameData.gameConfigs.odds;
     const { totalBets, roundId, exchangeRates } = this.gameData;
     const { session } = realPlayer;
     const rate = exchangeRates.code[session.currencyCode] * session.multiplier;
@@ -42,7 +41,6 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
     );
     const gameConfigs = {
       ...settings,
-      margin,
     };
     const { ownBets } = this.gameData.ingame[realPlayer.profile.name] || {
       ownBets: {},
@@ -107,6 +105,7 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
     const nextPlayer =
       this.gameData.result.currentPlayers[this.gameData.result.nextTurnIndex];
     const possibleActions = await getPossibleActions(this.gameData);
+    const existWinner = this.gameData.result.winners.length > 0;
     return {
       board: convertBoardState(this.gameData.result.board),
       currentTurnCount: this.gameData.roundId - this.gameData.initRoundId,
@@ -115,6 +114,8 @@ export class InGameConsumer extends Table.EventConsumers.TableInGameConsumer {
           ? this.gameData.result.action.playerColor
           : nextPlayer,
       possibleActions,
+      winner: existWinner ? this.gameData.result.winners[0] : undefined,
+      winningTime: existWinner ? this.gameData.remainingTime : undefined,
     };
   }
 }

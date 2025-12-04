@@ -218,6 +218,66 @@ describe("InGameConsumer", () => {
       // Assert
       expect(roundData.nextPlayer).toBe(PlayerColor.YELLOW);
     });
+
+    test("should include winner when there are winners", async () => {
+      // Arrange
+      mockGameData.result.winners = [PlayerColor.RED];
+      mockGameData.remainingTime = 25000;
+
+      // Act
+      const roundData = await consumer.generateGameState();
+
+      // Assert
+      expect(roundData.winner).toBe(PlayerColor.RED);
+    });
+
+    test("should include winningTime when there are winners", async () => {
+      // Arrange
+      mockGameData.result.winners = [PlayerColor.GREEN];
+      mockGameData.remainingTime = 42000;
+
+      // Act
+      const roundData = await consumer.generateGameState();
+
+      // Assert
+      expect(roundData.winningTime).toBe(42000);
+    });
+
+    test("should not include winner when there are no winners", async () => {
+      // Arrange
+      mockGameData.result.winners = [];
+
+      // Act
+      const roundData = await consumer.generateGameState();
+
+      // Assert
+      expect(roundData.winner).toBeUndefined();
+    });
+
+    test("should not include winningTime when there are no winners", async () => {
+      // Arrange
+      mockGameData.result.winners = [];
+      mockGameData.remainingTime = 25000;
+
+      // Act
+      const roundData = await consumer.generateGameState();
+
+      // Assert
+      expect(roundData.winningTime).toBeUndefined();
+    });
+
+    test("should return first winner when multiple winners exist", async () => {
+      // Arrange
+      mockGameData.result.winners = [PlayerColor.BLUE, PlayerColor.RED];
+      mockGameData.remainingTime = 30000;
+
+      // Act
+      const roundData = await consumer.generateGameState();
+
+      // Assert
+      expect(roundData.winner).toBe(PlayerColor.BLUE);
+      expect(roundData.winningTime).toBe(30000);
+    });
   });
 
   describe("buildPayload", () => {
@@ -426,7 +486,8 @@ describe("InGameConsumer", () => {
 
     test("should return empty players object when system is Mobi", async () => {
       // Arrange
-      const { Systems } = await import("sc-game-base/dist/constants/systems.js");
+      const { Systems } =
+        await import("sc-game-base/dist/constants/systems.js");
       mockRealPlayer.session.system = Systems.Mobi;
       consumer.buildPlayersPayload = jest.fn().mockReturnValue({ player1: {} });
 
@@ -440,7 +501,8 @@ describe("InGameConsumer", () => {
 
     test("should return payload without remainingTime when disabled and system is Mini", async () => {
       // Arrange
-      const { Systems } = await import("sc-game-base/dist/constants/systems.js");
+      const { Systems } =
+        await import("sc-game-base/dist/constants/systems.js");
       mockGameData.gameConfigs = {
         gameId: 1,
         enabled: false,
@@ -463,7 +525,8 @@ describe("InGameConsumer", () => {
 
     test("should return payload with remainingTime when not disabled or system is not Mini", async () => {
       // Arrange
-      const { Systems } = await import("sc-game-base/dist/constants/systems.js");
+      const { Systems } =
+        await import("sc-game-base/dist/constants/systems.js");
       mockRealPlayer.session.system = Systems.Web;
       consumer.buildPlayersPayload = jest.fn().mockReturnValue({ player1: {} });
 
@@ -478,7 +541,8 @@ describe("InGameConsumer", () => {
 
     test("should return payload with remainingTime when disabled but system is not Mini", async () => {
       // Arrange
-      const { Systems } = await import("sc-game-base/dist/constants/systems.js");
+      const { Systems } =
+        await import("sc-game-base/dist/constants/systems.js");
       mockGameData.gameConfigs = {
         gameId: 1,
         enabled: false,

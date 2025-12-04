@@ -29,7 +29,7 @@ jest.mock("sc-game-base", () => {
       Object.assign(this, params);
     }
 
-    resetForNewRound = jest.fn();
+    resetForNewRound() {}
     isStartingTime = jest.fn();
     startCron = jest.fn();
     getSettingForNewRound = jest.fn();
@@ -425,6 +425,211 @@ describe("GameCron", () => {
     });
   });
 
+  describe("resetForNewRound", () => {
+    test("should call super.resetForNewRound", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const gameCron = new GameCron(mockDeps);
+      gameCron.gameData.result.winners = [];
+
+      // Act
+      gameCron.resetForNewRound();
+
+      // Assert
+      expect(gameCron.resetForNewRound).toBeDefined();
+    });
+
+    test("should reset board when there are winners", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const gameCron = new GameCron(mockDeps);
+      gameCron.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [57, 57, 57, 57],
+          [PlayerColor.GREEN]: [10, 20, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
+        winners: [PlayerColor.RED],
+        dice: [6, 6],
+        action: {
+          oldPosition: 51,
+          newPosition: 57,
+          playerColor: PlayerColor.RED,
+        },
+      };
+
+      // Act
+      gameCron.resetForNewRound();
+
+      // Assert
+      expect(gameCron.gameData.result.board).toEqual({
+        [PlayerColor.RED]: [0, 0, 0, 0],
+        [PlayerColor.GREEN]: [0, 0, 0, 0],
+        [PlayerColor.YELLOW]: [0, 0, 0, 0],
+        [PlayerColor.BLUE]: [0, 0, 0, 0],
+      });
+    });
+
+    test("should reset currentPlayers to all four colors when there are winners", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const gameCron = new GameCron(mockDeps);
+      gameCron.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [57, 57, 57, 57],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [PlayerColor.RED],
+        winners: [PlayerColor.RED],
+        dice: [6, 6],
+        action: {
+          oldPosition: 51,
+          newPosition: 57,
+          playerColor: PlayerColor.RED,
+        },
+      };
+
+      // Act
+      gameCron.resetForNewRound();
+
+      // Assert
+      expect(gameCron.gameData.result.currentPlayers).toEqual([
+        PlayerColor.RED,
+        PlayerColor.GREEN,
+        PlayerColor.YELLOW,
+        PlayerColor.BLUE,
+      ]);
+    });
+
+    test("should reset winners to empty array when there are winners", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const gameCron = new GameCron(mockDeps);
+      gameCron.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [57, 57, 57, 57],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [PlayerColor.RED],
+        winners: [PlayerColor.RED],
+        dice: [6, 6],
+        action: {
+          oldPosition: 51,
+          newPosition: 57,
+          playerColor: PlayerColor.RED,
+        },
+      };
+
+      // Act
+      gameCron.resetForNewRound();
+
+      // Assert
+      expect(gameCron.gameData.result.winners).toEqual([]);
+    });
+
+    test("should reset dice to empty array when there are winners", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const gameCron = new GameCron(mockDeps);
+      gameCron.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [57, 57, 57, 57],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [PlayerColor.RED],
+        winners: [PlayerColor.RED],
+        dice: [6, 6],
+        action: {
+          oldPosition: 51,
+          newPosition: 57,
+          playerColor: PlayerColor.RED,
+        },
+      };
+
+      // Act
+      gameCron.resetForNewRound();
+
+      // Assert
+      expect(gameCron.gameData.result.dice).toEqual([]);
+    });
+
+    test("should reset action when there are winners", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const gameCron = new GameCron(mockDeps);
+      gameCron.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [57, 57, 57, 57],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [PlayerColor.RED],
+        winners: [PlayerColor.RED],
+        dice: [6, 6],
+        action: {
+          oldPosition: 51,
+          newPosition: 57,
+          playerColor: PlayerColor.RED,
+        },
+      };
+
+      // Act
+      gameCron.resetForNewRound();
+
+      // Assert
+      expect(gameCron.gameData.result.action).toEqual({
+        oldPosition: 0,
+        newPosition: 0,
+        playerColor: PlayerColor.RED,
+      });
+    });
+
+    test("should not reset board when there are no winners", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const gameCron = new GameCron(mockDeps);
+      const originalBoard = {
+        [PlayerColor.RED]: [10, 20, 0, 0],
+        [PlayerColor.GREEN]: [5, 0, 0, 0],
+        [PlayerColor.YELLOW]: [0, 0, 0, 0],
+        [PlayerColor.BLUE]: [0, 0, 0, 0],
+      };
+      gameCron.gameData.result = {
+        board: { ...originalBoard },
+        nextTurnIndex: 1,
+        currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
+        winners: [],
+        dice: [3, 4],
+        action: {
+          oldPosition: 10,
+          newPosition: 17,
+          playerColor: PlayerColor.RED,
+        },
+      };
+
+      // Act
+      gameCron.resetForNewRound();
+
+      // Assert - board should remain unchanged
+      expect(gameCron.gameData.result.winners).toEqual([]);
+      expect(gameCron.gameData.result.dice).toEqual([3, 4]);
+    });
+  });
+
   describe("proceed", () => {
     test("should call checkGameStatus when remainingTime equals wholeRound", async () => {
       // Arrange
@@ -433,6 +638,7 @@ describe("GameCron", () => {
       gameCron.gameData.remainingTime = 30000;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -452,6 +658,7 @@ describe("GameCron", () => {
       gameCron.gameData.remainingTime = 25000;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -472,6 +679,7 @@ describe("GameCron", () => {
       gameCron.gameData.disabled = false;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -491,6 +699,7 @@ describe("GameCron", () => {
       gameCron.gameData.disabled = true;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -510,6 +719,7 @@ describe("GameCron", () => {
       gameCron.gameData.disabled = false;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -537,6 +747,7 @@ describe("GameCron", () => {
       gameCron.gameData.disabled = false;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -558,6 +769,7 @@ describe("GameCron", () => {
       gameCron.gameData.disabled = false;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -579,6 +791,7 @@ describe("GameCron", () => {
       gameCron.gameData.disabled = false;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -604,6 +817,7 @@ describe("GameCron", () => {
       };
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -622,6 +836,88 @@ describe("GameCron", () => {
       expect(gameCron.gameData.settlementResultFromAdmin).toEqual({});
     });
 
+    test("should set remainingTime to wholeRoundWithWinner when there are winners", async () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const gameCron = new GameCron(mockDeps);
+      gameCron.gameData.remainingTime = 0;
+      gameCron.gameData.disabled = false;
+      gameCron.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [57, 57, 57, 57],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 0,
+        currentPlayers: [PlayerColor.RED],
+        winners: [],
+        dice: [6, 6],
+        action: {
+          oldPosition: 51,
+          newPosition: 57,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      gameCron.gameData.settlementResultFromAdmin = {} as any;
+      gameCron.definition.durations = {
+        wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
+        placingBets: 20000,
+        lockingBet: 5000,
+      };
+
+      // Mock generateResult to set winners
+      mockDeps.roundResultConsumer.generateResult.mockImplementation(() => {
+        gameCron.gameData.result.winners = [PlayerColor.RED];
+        return Promise.resolve();
+      });
+
+      // Act
+      await gameCron.proceed();
+
+      // Assert
+      expect(gameCron.gameData.remainingTime).toBe(42000);
+    });
+
+    test("should keep wholeRound duration when there are no winners", async () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const gameCron = new GameCron(mockDeps);
+      gameCron.gameData.remainingTime = 0;
+      gameCron.gameData.disabled = false;
+      gameCron.gameData.result = {
+        board: {
+          [PlayerColor.RED]: [10, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 1,
+        currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
+        winners: [],
+        dice: [3, 4],
+        action: {
+          oldPosition: 0,
+          newPosition: 7,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      gameCron.gameData.settlementResultFromAdmin = {} as any;
+      gameCron.definition.durations = {
+        wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
+        placingBets: 20000,
+        lockingBet: 5000,
+      };
+
+      // Act
+      await gameCron.proceed();
+
+      // Assert
+      expect(gameCron.gameData.remainingTime).toBe(30000);
+    });
+
     test("should run bot and publish running round info when remainingTime is between 0 and placingBets", async () => {
       // Arrange
       const mockDeps = createMockDependencies();
@@ -630,6 +926,7 @@ describe("GameCron", () => {
       gameCron.gameData.disabled = false;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -653,6 +950,7 @@ describe("GameCron", () => {
       gameCron.gameData.disabled = false;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -682,6 +980,7 @@ describe("GameCron", () => {
       };
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -713,6 +1012,7 @@ describe("GameCron", () => {
       };
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -742,6 +1042,7 @@ describe("GameCron", () => {
       };
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -774,6 +1075,7 @@ describe("GameCron", () => {
       };
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -799,6 +1101,7 @@ describe("GameCron", () => {
       gameCron.gameData.disabled = false;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -815,6 +1118,7 @@ describe("GameCron", () => {
       gameCron.gameData.disabled = false;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };
@@ -842,6 +1146,7 @@ describe("GameCron", () => {
       gameCron.gameData.disabled = false;
       gameCron.definition.durations = {
         wholeRound: 30000,
+        wholeRoundWithWinner: 42000,
         placingBets: 20000,
         lockingBet: 5000,
       };

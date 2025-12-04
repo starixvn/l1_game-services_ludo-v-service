@@ -1,3 +1,5 @@
+import { PlayerColor } from "@rd/ludo-rules";
+
 export const GAME_NAME = "ludo";
 export const BET_CHOICES = {
   big: "big",
@@ -43,3 +45,10 @@ export const MARGIN_KEYS = {
   goStable: "marginGoStable",
   noStable: "marginNoStable",
 };
+
+export const ALL_PLAYERS = [
+  PlayerColor.RED,
+  PlayerColor.GREEN,
+  PlayerColor.YELLOW,
+  PlayerColor.BLUE,
+];

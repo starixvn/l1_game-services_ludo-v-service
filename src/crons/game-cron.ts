@@ -8,6 +8,8 @@ import { RunningRoundInfoPublisher } from "../event-publishers/index.js";
 import GameData from "../game-data.js";
 import GameDefinition from "../game-definition.js";
 import { convertMarginKeys } from "../helpers/convert-margin-keys.js";
+import { PlayerColor } from "@rd/ludo-rules";
+import { initNewBoard } from "../helpers/index.js";
 
 export class GameCron extends Table.Crons.TableGameCron {
   declare bot: Table.Crons.TableGameBot;
@@ -76,6 +78,27 @@ export class GameCron extends Table.Crons.TableGameCron {
     );
   }
 
+  resetForNewRound() {
+    super.resetForNewRound();
+
+    if (this.gameData.result.winners.length > 0) {
+      this.gameData.result.board = initNewBoard();
+      this.gameData.result.currentPlayers = [
+        PlayerColor.RED,
+        PlayerColor.GREEN,
+        PlayerColor.YELLOW,
+        PlayerColor.BLUE,
+      ];
+      this.gameData.result.winners = [];
+      this.gameData.result.dice = [];
+      this.gameData.result.action = {
+        oldPosition: 0,
+        newPosition: 0,
+        playerColor: PlayerColor.RED,
+      };
+    }
+  }
+
   async proceed() {
     const { durations } = this.definition;
     if (this.gameData.remainingTime === durations.wholeRound) {
@@ -105,6 +128,9 @@ export class GameCron extends Table.Crons.TableGameCron {
     if (remainingTime < 0) {
       this.gameData.remainingTime = durations.wholeRound;
       await this.roundResultConsumer.generateResult();
+      if (this.gameData.result.winners.length > 0) {
+        this.gameData.remainingTime = durations.wholeRoundWithWinner;
+      }
       await this.settleGameRoundConsumer.settleRound();
       this.gameData.settlementResultFromAdmin = {} as any;
     } else if (remainingTime < durations.placingBets) {

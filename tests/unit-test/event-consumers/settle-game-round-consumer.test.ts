@@ -237,6 +237,102 @@ describe("SettleGameRoundConsumer", () => {
       });
     });
 
+    test("should include nextPlayer when there are winners", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new SettleGameRoundConsumer(mockDeps);
+      const result: IResult = {
+        board: {
+          [PlayerColor.RED]: [57, 57, 57, 57],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 2,
+        currentPlayers: [PlayerColor.RED],
+        winners: [PlayerColor.RED],
+        dice: [6, 6],
+        action: {
+          oldPosition: 51,
+          newPosition: 57,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      const settlementResult: ISettlementResult = {
+        big: true,
+        small: false,
+        odd: false,
+        even: true,
+        kick: false,
+        noKick: true,
+        move: true,
+        noMove: false,
+        release: false,
+        noRelease: true,
+        goStable: true,
+        noStable: false,
+      };
+      const roundId = 100;
+
+      // Act
+      const roundResult = consumer.collectRoundResult(
+        result,
+        settlementResult,
+        roundId,
+      );
+
+      // Assert
+      expect(roundResult.result.nextPlayer).toBe(PlayerColor.YELLOW); // ALL_PLAYERS[2]
+    });
+
+    test("should not include nextPlayer when there are no winners", () => {
+      // Arrange
+      const mockDeps = createMockDependencies();
+      const consumer = new SettleGameRoundConsumer(mockDeps);
+      const result: IResult = {
+        board: {
+          [PlayerColor.RED]: [10, 0, 0, 0],
+          [PlayerColor.GREEN]: [0, 0, 0, 0],
+          [PlayerColor.YELLOW]: [0, 0, 0, 0],
+          [PlayerColor.BLUE]: [0, 0, 0, 0],
+        },
+        nextTurnIndex: 1,
+        currentPlayers: [PlayerColor.RED, PlayerColor.GREEN],
+        winners: [],
+        dice: [3, 4],
+        action: {
+          oldPosition: 0,
+          newPosition: 7,
+          playerColor: PlayerColor.RED,
+        },
+      };
+      const settlementResult: ISettlementResult = {
+        big: false,
+        small: true,
+        odd: true,
+        even: false,
+        kick: false,
+        noKick: true,
+        move: true,
+        noMove: false,
+        release: false,
+        noRelease: true,
+        goStable: false,
+        noStable: true,
+      };
+      const roundId = 50;
+
+      // Act
+      const roundResult = consumer.collectRoundResult(
+        result,
+        settlementResult,
+        roundId,
+      );
+
+      // Assert
+      expect(roundResult.result.nextPlayer).toBeUndefined();
+    });
+
     test("should handle different dice combinations", () => {
       // Arrange
       const mockDeps = createMockDependencies();
