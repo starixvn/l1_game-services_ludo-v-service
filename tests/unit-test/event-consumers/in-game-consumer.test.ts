@@ -486,8 +486,9 @@ describe("InGameConsumer", () => {
 
     test("should return empty players object when system is Mobi", async () => {
       // Arrange
-      const { Systems } =
-        await import("sc-game-base/dist/constants/systems.js");
+      const { Systems } = await import(
+        "sc-game-base/dist/constants/systems.js"
+      );
       mockRealPlayer.session.system = Systems.Mobi;
       consumer.buildPlayersPayload = jest.fn().mockReturnValue({ player1: {} });
 
@@ -501,8 +502,9 @@ describe("InGameConsumer", () => {
 
     test("should return payload without remainingTime when disabled and system is Mini", async () => {
       // Arrange
-      const { Systems } =
-        await import("sc-game-base/dist/constants/systems.js");
+      const { Systems } = await import(
+        "sc-game-base/dist/constants/systems.js"
+      );
       mockGameData.gameConfigs = {
         gameId: 1,
         enabled: false,
@@ -525,9 +527,10 @@ describe("InGameConsumer", () => {
 
     test("should return payload with remainingTime when not disabled or system is not Mini", async () => {
       // Arrange
-      const { Systems } =
-        await import("sc-game-base/dist/constants/systems.js");
-      mockRealPlayer.session.system = Systems.Web;
+      const { Systems } = await import(
+        "sc-game-base/dist/constants/systems.js"
+      );
+      mockRealPlayer.session.system = Systems.Cocos;
       consumer.buildPlayersPayload = jest.fn().mockReturnValue({ player1: {} });
 
       // Act
@@ -541,8 +544,9 @@ describe("InGameConsumer", () => {
 
     test("should return payload with remainingTime when disabled but system is not Mini", async () => {
       // Arrange
-      const { Systems } =
-        await import("sc-game-base/dist/constants/systems.js");
+      const { Systems } = await import(
+        "sc-game-base/dist/constants/systems.js"
+      );
       mockGameData.gameConfigs = {
         gameId: 1,
         enabled: false,
@@ -551,7 +555,7 @@ describe("InGameConsumer", () => {
         enableFreeBet: false,
         boostedChoices: false,
       };
-      mockRealPlayer.session.system = Systems.Web;
+      mockRealPlayer.session.system = Systems.Cocos;
       consumer.buildPlayersPayload = jest.fn().mockReturnValue({ player1: {} });
 
       // Act
@@ -571,7 +575,8 @@ describe("InGameConsumer", () => {
     beforeEach(async () => {
       consumer = Object.create(InGameConsumer.prototype);
       const { Table } = await import("sc-game-base");
-      const mockBaseInstance = new Table.EventConsumers.TableInGameConsumer();
+      const mockBaseInstance = new (Table.EventConsumers
+        .TableInGameConsumer as any)();
       Object.setPrototypeOf(Object.getPrototypeOf(consumer), mockBaseInstance);
 
       mockGameData = new GameData(30000);

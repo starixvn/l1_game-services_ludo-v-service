@@ -296,7 +296,7 @@ describe("generateResult", () => {
       mockUpdateGameState.mockImplementation(
         async (board, players, turnIndex, dice, moveCallback) => {
           // Call the callback to test line 38
-          await moveCallback(mockMoveInput);
+          await moveCallback(mockMoveInput as any);
           return {
             gameState: {
               board: data.currentBoardState,
